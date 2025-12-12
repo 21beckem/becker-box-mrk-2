@@ -1,0 +1,17 @@
+{
+  "name": "becker-box-mrk-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Michael Becker",
+  "license": "ISC",
+  "dependencies": {
+    "buffer-crc32": "^1.0.0",
+    "dgram": "^1.0.1",
+    "express": "^5.2.1"
+  }
+}
