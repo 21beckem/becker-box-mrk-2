@@ -1,0 +1,6 @@
+meLog: 1273
+dolphinLog: 371
+
+didWork: 902
+didntWork: 371
+percentage that did work: 70.8562450903378%

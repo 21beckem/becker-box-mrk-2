@@ -23,8 +23,26 @@ const dolphinLog = fs.readFileSync('logs/dolphin.txt', 'utf-8')
             line
         };
     });
-debugger;
 
+let didWork = [];
+let didntWork = [];
 
+meLog.forEach(element => {
+    if (dolphinLog.some(d => d.got === element.crc)) {
+        didntWork.push(element);
+    } else {
+        didWork.push(element);
+    }
+});
 
-// parse both logs into useable arrays
+// write those to files
+fs.writeFileSync('logs/didWork.txt', didWork.map(d => d.line).join('\n'));
+fs.writeFileSync('logs/didntWork.txt', didntWork.map(d => d.line).join('\n'));
+
+fs.writeFileSync('logs/stats.txt', [
+    `meLog: ${meLog.length}`,
+    `dolphinLog: ${dolphinLog.length}`,
+    `didWork: ${didWork.length}`,
+    `didntWork: ${didntWork.length}`,
+    `percentage that did work: ${didWork.length / (didWork.length + didntWork.length) * 100}%`
+].join('\n'));
