@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // read me.txt and dolphin.txt and split them by lines
-const meLog = fs.readFileSync('logs/me.txt', 'utf-8')
+const meLog = fs.readFileSync('me.txt', 'utf-8')
     .split('\n')
     .map(line => {
         let s = line.split(' | ')
@@ -12,7 +12,7 @@ const meLog = fs.readFileSync('logs/me.txt', 'utf-8')
             line
         };
     });
-const dolphinLog = fs.readFileSync('logs/dolphin.txt', 'utf-8')
+const dolphinLog = fs.readFileSync('dolphin.txt', 'utf-8')
     .split('\n')
     .map(line => {
         let s = line.split('bad CRC in header: got ')[1];
@@ -45,10 +45,10 @@ meLog.forEach(m => {
 });
 
 // write those to files
-fs.writeFileSync('logs/didWork.txt', didWork.map(d => d.fullLine).join('\n'));
-fs.writeFileSync('logs/didntWork.txt', didntWork.map(d => d.fullLine).join('\n'));
+fs.writeFileSync('didWork.txt', didWork.map(d => d.fullLine).join('\n'));
+fs.writeFileSync('didntWork.txt', didntWork.map(d => d.fullLine).join('\n'));
 
-fs.writeFileSync('logs/stats.txt', [
+fs.writeFileSync('stats.txt', [
     `meLog: ${meLog.length}`,
     `dolphinLog: ${dolphinLog.length}`,
     `didWork: ${didWork.length}`,
