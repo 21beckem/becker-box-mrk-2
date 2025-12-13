@@ -27,17 +27,26 @@ const dolphinLog = fs.readFileSync('logs/dolphin.txt', 'utf-8')
 let didWork = [];
 let didntWork = [];
 
-meLog.forEach(element => {
-    if (dolphinLog.some(d => d.got === element.crc)) {
-        didntWork.push(element);
+meLog.forEach(m => {
+    if (dolphinLog.some(d => d.got === m.crc)) {
+        let d = dolphinLog.find(d => d.got === m.crc);
+        didntWork.push({
+            me: m,
+            dolphin: d,
+            fullLine: `me: ${m.line} $$$ dolphin: ${d.line}`
+        });
     } else {
-        didWork.push(element);
+        didWork.push({
+            me: m,
+            dolphin: null,
+            fullLine: `me: ${m.line} $$$ dolphin: null`
+        });
     }
 });
 
 // write those to files
-fs.writeFileSync('logs/didWork.txt', didWork.map(d => d.line).join('\n'));
-fs.writeFileSync('logs/didntWork.txt', didntWork.map(d => d.line).join('\n'));
+fs.writeFileSync('logs/didWork.txt', didWork.map(d => d.fullLine).join('\n'));
+fs.writeFileSync('logs/didntWork.txt', didntWork.map(d => d.fullLine).join('\n'));
 
 fs.writeFileSync('logs/stats.txt', [
     `meLog: ${meLog.length}`,
