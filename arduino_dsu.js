@@ -102,9 +102,45 @@ function makeInfoPacket(slotNumber) {
   return out;
 }
 
+function defaultButtons() {
+  return {
+    // (only first 4 bits of byte1 are used by dolphin for some reason)
+    byte1: 0x00,
+    byte2: 0x00, // not used by dolphin at all
+
+    // single bytes
+    home: 0x01,   // offset 38
+    touch: 0x01,  // offset 39
+
+    // sticks (unsigned 0..255). 128 is neutral/center usually.
+    leftStickX: 128,  // offset 40
+    leftStickY: 128,  // offset 41
+    rightStickX: 128, // offset 42
+    rightStickY: 128, // offset 43
+
+    // analog D-pad (0..255)
+    analogDpadLeft: 255,  // offset 44
+    analogDpadDown: 255,  // offset 45
+    analogDpadRight: 255, // offset 46
+    analogDpadUp: 255,    // offset 47
+
+    // face analogs (Y,B,A,X) offsets 48..51
+    analogY: 255,
+    analogB: 255,
+    analogA: 255,
+    analogX: 255,
+
+    // analog shoulder/triggers offsets 52..55: R1, L1, R2, L2
+    analogR1: 255,
+    analogL1: 255,
+    analogR2: 255,
+    analogL2: 255,
+  };
+}
+
 // --- Build data packet (100 bytes) ---
 // Mirrors makeDataPacket(...) from Arduino code exactly.
-function makeDataPacket(packetCount, timestamp32, accX, accY, accZ, gyroP, gyroY, gyroR) {
+function makeDataPacket(packetCount, timestamp32, accX, accY, accZ, gyroP, gyroY, gyroR, buttons) {
   const out = Buffer.alloc(DATA_PACKET_TOTAL, 0);
 
   // Magic
@@ -135,8 +171,38 @@ function makeDataPacket(packetCount, timestamp32, accX, accY, accZ, gyroP, gyroY
   // Packet number (for this client) little-endian at offset 32
   out.writeUInt32LE(packetCount >>> 0, 32);
 
-  // Buttons / sticks / analogs / touch: Arduino zeroes most of these; copy exact zeros and positions
-  // offsets 36..67 remain zero (we allocated zeros)
+  
+  // ---------- BUTTONS / STICKS / ANALOGS REGION: offsets 36..55 ----------
+  // buttons argument defaults
+  if (!buttons) buttons = defaultButtons();
+
+  // Map README offsets (16..35) to our buffer by adding +20 => 36..55
+  const bOff = 36;
+  out[bOff + 0] = buttons.byte1 & 0xFF;           // README offset 16 -> buffer 36
+  out[bOff + 1] = buttons.byte2 & 0xFF;           // README offset 17 -> buffer 37
+  out[bOff + 2] = buttons.home & 0xFF;            // README offset 18 -> buffer 38
+  out[bOff + 3] = buttons.touch & 0xFF;           // README offset 19 -> buffer 39
+
+  out[bOff + 4] = buttons.leftStickX & 0xFF;      // 20 -> 40
+  out[bOff + 5] = buttons.leftStickY & 0xFF;      // 21 -> 41
+  out[bOff + 6] = buttons.rightStickX & 0xFF;     // 22 -> 42
+  out[bOff + 7] = buttons.rightStickY & 0xFF;     // 23 -> 43
+
+  out[bOff + 8] = buttons.analogDpadLeft & 0xFF;  // 24 -> 44
+  out[bOff + 9] = buttons.analogDpadDown & 0xFF;  // 25 -> 45
+  out[bOff +10] = buttons.analogDpadRight & 0xFF; // 26 -> 46
+  out[bOff +11] = buttons.analogDpadUp & 0xFF;    // 27 -> 47
+
+  out[bOff +12] = buttons.analogY & 0xFF;         // 28 -> 48
+  out[bOff +13] = buttons.analogB & 0xFF;         // 29 -> 49
+  out[bOff +14] = buttons.analogA & 0xFF;         // 30 -> 50
+  out[bOff +15] = buttons.analogX & 0xFF;         // 31 -> 51
+
+  out[bOff +16] = buttons.analogR1 & 0xFF;        // 32 -> 52
+  out[bOff +17] = buttons.analogL1 & 0xFF;        // 33 -> 53
+  out[bOff +18] = buttons.analogR2 & 0xFF;        // 34 -> 54
+  out[bOff +19] = buttons.analogL2 & 0xFF;        // 35 -> 55
+  // ---------- end buttons region ----------
 
   // Timestamp: Arduino places 4 lower bytes at offset 68 and zeros the higher 4 bytes at 72..75
   out.writeUInt32LE(timestamp32 >>> 0, 68);
@@ -204,6 +270,7 @@ server.bind(UDP_PORT, () => {
 });
 
 // --- Periodic sample producer (replaces MPU6050 reads with dummy data) ---
+let offset = 0;
 setInterval(() => {
   if (!dataReplyAddr || !dataReplyPort) return; // nobody subscribed
 
@@ -215,7 +282,8 @@ setInterval(() => {
   const dummyAccZ = 1.0;  // standing still -> ~1g on Z
   const dummyGyroP = 0.0;
   const dummyGyroY = 0.0;
-  const dummyGyroR = 0.0;
+  const dummyGyroR = 0.0 + Math.sin(offset * Math.PI / 180) * 55.0;
+  offset = (offset + 1);
 
   // packet counter and timestamp
   packetCounter = (packetCounter + 1) >>> 0;
