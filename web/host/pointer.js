@@ -1,6 +1,5 @@
 export default class Pointer {
-    constructor(slot, playerId) {
-        this.id = playerId;
+    constructor(slot) {
         this.states = {};
         this.btnEvents = {
             'u_click': function(){},
@@ -117,7 +116,7 @@ export default class Pointer {
         });
         oldEls.forEach(e =>  e.classList.remove('hover') );
     }
-    destroy() {
+    remove() {
         this.DIV.remove();
     }
 }

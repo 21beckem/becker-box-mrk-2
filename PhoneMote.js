@@ -309,7 +309,6 @@ class DSUServer {
 
 
 const PhoneMote = new (class FONEMOTE {
-    #disconnectTimeouts = [null, null, null, null];
     constructor() {
         this.server = new DSUServer('0.0.0.0', UDP_PORT);
         this.server.start();
@@ -321,34 +320,15 @@ const PhoneMote = new (class FONEMOTE {
         let nextSlot = this.server.controllerStates[nextSlotNum];
         nextSlot.connectedState = 2;
 
-        this.#restartDisconnectTimer(nextSlotNum);
         return nextSlotNum;
     }
     setData(slot, data) {
-        this.#restartDisconnectTimer(slot);
         this.server.controllerStates[slot].data = data;
     }
     setDataAttr(slot, attr, val) {
-        this.#restartDisconnectTimer(slot);
         this.server.controllerStates[slot].data[attr] = val;
     }
     disconnect(slot) {
-        this.#removeDisconnectTimer(slot);
-        this.server.controllerStates[slot].connectedState = 0;
-    }
-
-
-    #removeDisconnectTimer(slot) {
-        if (this.#disconnectTimeouts[slot])
-            clearTimeout(this.#disconnectTimeouts[slot]);
-        this.#disconnectTimeouts[slot] = null;
-    }
-    #restartDisconnectTimer(slot) {
-        this.#removeDisconnectTimer(slot);
-        this.#disconnectTimeouts[slot] = setTimeout(() => this.#disconnect(slot), DISCONNECT_TIMEOUT_MS);
-    }
-    #disconnect(slot) {
-        console.warn(`Disconnecting slot ${slot} due to inactivity`);
         this.server.controllerStates[slot].connectedState = 0;
     }
 })();

@@ -18,7 +18,7 @@
                 <p style="font-size: 20px; margin-bottom: 100px;">Connect to a Wii host</p>
                 <a style="font-size: 30px;">Game Code:</a>
                 <br>
-                <input type="text" id="gameCodeInput" maxlength="4" pattern="\d{4}" placeholder="&#9679;&#9679;&#9679;&#9679;" autocomplete="off">
+                <input type="text" id="gameCodeInput" inputmode="numeric" pattern="[0-9]*" placeholder="&#9679;&#9679;&#9679;&#9679;" autocomplete="off">
                 <br>
                 <div style="height: 40px;"></div>
                 <button class="wiiUIbtn" onclick="Remote.connectWithCode(_('gameCodeInput').value);">Connect</button>
