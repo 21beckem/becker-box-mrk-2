@@ -6,7 +6,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js"
+    "start": "electron ."
   },
   "author": "Michael Becker",
   "license": "ISC",
@@ -14,5 +14,8 @@
     "buffer-crc32": "^1.0.0",
     "dgram": "^1.0.1",
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "electron": "^39.2.7"
   }
 }
