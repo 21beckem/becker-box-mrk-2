@@ -10,7 +10,7 @@ export default class Player {
         this.parent = parent;
         this.pointer = new Pointer(this.slot);
         this.#initConn();
-        setTimeout(() => this.conn.send({slot: this.slot}), 500);
+        setTimeout(() => this.conn.send({slot: this.slot}), 100);
 
         this.#restartDisconnectTimer();
     }

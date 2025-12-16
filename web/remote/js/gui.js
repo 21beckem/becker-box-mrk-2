@@ -49,6 +49,12 @@ class GUI {
 			} else if (elem.msRequestFullscreen) {
 				elem.msRequestFullscreen();
 			}
+
+			// ensure the page doesn't destort when going to fullscreen
+			window.scrollTo(0, 0);
+			document.body.scrollTop = 0;
+			_('RemotePage').style.overflowY = 'unset';
+			setTimeout(() => _('RemotePage').style.overflowY = 'hidden', 10);
 		} catch (e) { }
 	}
 	static hapticFeedback(n = 50) {

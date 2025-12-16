@@ -68,8 +68,8 @@ class Remote {
 		});
 		this.conn.on('data', (data) => {
 			console.log('Received', data);
-			if (data.slot) {
-				GUI.setSlot(data.slot + 1);
+			if (data.slot || data.slot === 0) {
+				GUI.setSlot(data.slot);
 			}
 		});
 		this.conn.on('disconnected', () => {
