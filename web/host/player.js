@@ -3,6 +3,7 @@ const DISCONNECT_TIMEOUT_MS = 10000;
 
 export default class Player {
     #disconnectTimeout = null;
+    #lastPacket = null;
     constructor(slot, conn, parent) {
         this.removed = false;
         this.slot = slot;
@@ -10,15 +11,41 @@ export default class Player {
         this.parent = parent;
         this.pointer = new Pointer(this.slot);
         this.#initConn();
-        setTimeout(() => this.conn.send({slot: this.slot}), 100);
 
         this.#restartDisconnectTimer();
     }
     #initConn() {
-        this.conn.on('data', (data) => {
+        this.conn.on('open', () => {
             this.#restartDisconnectTimer();
+            this.conn.send({slot: this.slot});
+        })
+        this.conn.on('data', (data) => {
+            data = this.#convertData(data);
+            this.#restartDisconnectTimer();
+
+            this.pointer.newPacket(data);
             window.electron.sendPacket(this.slot, data);
         });
+    }
+    #convertData(data) {
+        if (!this.#lastPacket) {
+            this.#lastPacket = data;
+            return data;
+        }
+        let newData = {
+            ...data,
+            raw: data,
+
+            AccelerometerX: data.AccelerometerX - this.#lastPacket.AccelerometerX,
+            AccelerometerY: data.AccelerometerY - this.#lastPacket.AccelerometerY,
+            AccelerometerZ: data.AccelerometerZ - this.#lastPacket.AccelerometerZ,
+
+            Gyroscope_Yaw: data.Gyroscope_Yaw - this.#lastPacket.Gyroscope_Yaw,
+            Gyroscope_Pitch: data.Gyroscope_Pitch - this.#lastPacket.Gyroscope_Pitch,
+            Gyroscope_Roll: data.Gyroscope_Roll - this.#lastPacket.Gyroscope_Roll
+        };
+        this.#lastPacket = data;
+        return newData;
     }
     remove() {
         this.#disconnect();

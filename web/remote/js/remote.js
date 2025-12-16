@@ -89,13 +89,25 @@ class Remote {
 		// start sending packets to the host
 		this.startSendingPackets();
 	}
-	static clamp = (x) => (Number.isNaN(x) || x === null || x === undefined) ? 0 : x.toFixed(2);
+	static clamp = (x) => (Number.isNaN(x) || x === null || x === undefined) ? 0 : x; // Math.round(x * 100) / 100;
 	static handleMotion(e) {
+		// alert([
+		// 	e.acceleration.x,
+		// 	this.clamp(e.acceleration.x),
+		// 	PACKET.AccelerometerX,
+		// 	this.clamp(e.acceleration.x) - PACKET.AccelerometerX
+		// ].join('\n'));
+		// PACKET.AccelerometerX = this.clamp(e.acceleration.x) - PACKET.AccelerometerX;
+		// PACKET.AccelerometerY = this.clamp(e.acceleration.y) - PACKET.AccelerometerY;
+		// PACKET.AccelerometerZ = this.clamp(e.acceleration.z) - PACKET.AccelerometerZ;
 		PACKET.AccelerometerX = this.clamp(e.acceleration.x);
 		PACKET.AccelerometerY = this.clamp(e.acceleration.y);
 		PACKET.AccelerometerZ = this.clamp(e.acceleration.z);
 	}
 	static handleOrientation(e) {
+		// PACKET.Gyroscope_Yaw = this.clamp(e.alpha) - PACKET.Gyroscope_Yaw;
+		// PACKET.Gyroscope_Pitch = this.clamp(e.beta) - PACKET.Gyroscope_Pitch;
+		// PACKET.Gyroscope_Roll = this.clamp(e.gamma) - PACKET.Gyroscope_Roll;
 		PACKET.Gyroscope_Yaw = this.clamp(e.alpha);
 		PACKET.Gyroscope_Pitch = this.clamp(e.beta);
 		PACKET.Gyroscope_Roll = this.clamp(e.gamma);

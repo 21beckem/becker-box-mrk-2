@@ -1,41 +1,6 @@
 export default class Pointer {
     constructor(slot) {
         this.states = {};
-        this.btnEvents = {
-            'u_click': function(){},
-            'u_down': function(){},
-            'u_up': function(){},
-            'l_click': function(){},
-            'l_down': function(){},
-            'l_up': function(){},
-            'r_click': function(){},
-            'r_down': function(){},
-            'r_up': function(){},
-            'd_click': function(){},
-            'd_down': function(){},
-            'd_up': function(){},
-            'a_click': this.clickAtPointer.bind(this),
-            'a_down': function(){},
-            'a_up': function(){},
-            'b_click': function(){},
-            'b_down': function(){},
-            'b_up': function(){},
-            '-_click': function(){},
-            '-_down': function(){},
-            '-_up': function(){},
-            'H_click': function(){},
-            'H_down': function(){},
-            'H_up': function(){},
-            '+_click': function(){},
-            '+_down': function(){},
-            '+_up': function(){},
-            '1_click': function(){},
-            '1_down': function(){},
-            '1_up': function(){},
-            '2_click': function(){},
-            '2_down': function(){},
-            '2_up': function(){}
-        }
         this.pos = { x: 0, y: 0 };
         this.hoveredElements = [];
         this.DIV = document.createElement('div');
@@ -44,40 +9,22 @@ export default class Pointer {
         document.body.appendChild(this.DIV);
         this.center();
     }
-    addEventListener(btn, event, callback) {
-        this.btnEvents[btn+'_'+event] = callback;
-    }
-    removeEventListener(btn, event) {
-        this.btnEvents[btn+'_'+event] = function(){};
-    }
-    clearEventListeners() {
-        for (const [key, value] of Object.entries(this.btnEvents)) {
-            this.btnEvents[key] = function(){};
-        }
-        this.btnEvents['a_click'] = this.clickAtPointer.bind(this);
-    }
     clickAtPointer() {
-        try {
-            this.hoveredElements[0].click();
-        } catch (e) {}
+        this.hoveredElements[0]?.click();
     }
     newPacket(data) {
+        // console.log(data.Gyroscope_Yaw, data.Gyroscope_Pitch);
         this.move(
-            -data['gyro']['z'],
-            -data['gyro']['x']
+            -data.Gyroscope_Yaw,
+            -data.Gyroscope_Pitch
         );
+        this.rotateTo(data.raw.Gyroscope_Roll);
+
         // send button events
-        for (const [key, value] of Object.entries(data.buttons)) {
-            if (value != this.states[key]) {
-                if (value) {
-                    this.btnEvents[key + '_down']();
-                } else {
-                    this.btnEvents[key + '_up']();
-                    this.btnEvents[key + '_click']();
-                }
-            }
-        }
-        this.states = data.buttons;
+        if (data.A===1 && this.states.A===0)
+            this.clickAtPointer();
+
+        this.states = data;
     }
     center() {
         this.moveTo(document.documentElement.clientWidth/2, document.documentElement.clientHeight/2);
@@ -88,8 +35,11 @@ export default class Pointer {
         this.DIV.style.top = `${y}px`;
         this.handleMoveEvents();
     }
+    rotateTo(angle) {
+        this.DIV.style.transform = `rotate(${angle}deg)`;
+    }
     move(x, y) {
-        const speedFactor = 0.03;
+        const speedFactor = 0.05;
         const xSpeed = document.documentElement.clientWidth * speedFactor;
         const ySpeed = document.documentElement.clientHeight * speedFactor;
 

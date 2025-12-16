@@ -41,10 +41,10 @@ const PlayerManager = new (class PlayerManager {
         }
 
         console.log(`Connecting peer ${conn.peer} to slot ${slot}`);
-        console.log(conn);
+        // console.log(conn);
         this.players[slot] = new Player(slot, conn, this);
         conn.on('close', () => this.removePlayer(slot));
-        console.log(this.players);
+        // console.log(this.players);
     }
     removePlayer(slot) {
         this.players[slot]?.remove();
