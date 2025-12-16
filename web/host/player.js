@@ -15,8 +15,10 @@ export default class Player {
     }
     #initConn() {
         this.conn.on('data', (data) => {
+            this.#restartDisconnectTimer();
             window.electron.sendPacket(this.slot, data)
         });
+        this.conn.send(this.slot);
     }
     remove() {
         this.#disconnect();

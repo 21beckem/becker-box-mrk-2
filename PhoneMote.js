@@ -322,13 +322,16 @@ const PhoneMote = new (class FONEMOTE {
 
         return nextSlotNum;
     }
-    setData(slot, data) {
+    setPacket(slot, data) {
+        if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
         this.server.controllerStates[slot].data = data;
     }
     setDataAttr(slot, attr, val) {
+        if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
         this.server.controllerStates[slot].data[attr] = val;
     }
     disconnect(slot) {
+        if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
         this.server.controllerStates[slot].connectedState = 0;
     }
 })();

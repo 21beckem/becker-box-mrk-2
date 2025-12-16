@@ -1,0 +1,246 @@
+:root {
+	--dpad-radius: 10px;
+	--bBtn-size: 170px;
+	--bBtn-top: 120px;
+}
+
+body {
+	touch-action: none;
+	margin: 0;
+	padding: 0;
+	background: #eaeaea;
+	font-family: 'ADLaM Display';
+}
+
+#connectPage {
+	display: flex;
+	align-items: center;
+	height: 100vh;
+	margin: 0;
+	overflow: hidden;
+	flex-direction: column;
+	touch-action: manipulation;
+	color: #383838;
+	padding: 0 30px;
+}
+
+#gameCodeInput {
+	margin-top: 10px;
+	font-family: inherit;
+	font-size: 40px;
+	border-radius: 10px;
+	padding: 5px 20px;
+	text-align: center;
+	width: 150px;
+	text-transform: uppercase;
+	color: #323232;
+	border: solid black 1px;
+}
+
+.wiiUIbtn {
+	font-family: inherit;
+	font-size: 30px;
+	letter-spacing: 1px;
+	color: #323232;
+	height: 60px;
+	width: 170px;
+	border: solid black 2px;
+	border-radius: 20px;
+	background-color: white;
+	cursor: pointer;
+	transition: transform 0.15s;
+}
+
+#RemotePage {
+	-webkit-user-select: none;
+	/* Safari */
+	-ms-user-select: none;
+	/* IE 10 and IE 11 */
+	user-select: none;
+	/* Standard syntax */
+	display: flex;
+	align-items: center;
+	height: 100dvh;
+	margin: 0;
+	overflow: hidden;
+	flex-direction: column;
+	touch-action: manipulation;
+	color: #383838;
+	justify-content: space-evenly;
+}
+
+.bTri .btn {
+	position: fixed;
+	top: var(--bBtn-top);
+	width: var(--bBtn-size);
+	height: var(--bBtn-size);
+	border-radius: 20px;
+	transform: rotate(45deg);
+	font-size: 32px;
+	z-index: 1;
+}
+
+.bTri.one .btn {
+	left: calc(var(--bBtn-size) / -2)
+}
+
+.bTri.two .btn {
+	right: calc(var(--bBtn-size) / -2)
+}
+
+.bTri.one .text {
+	left: 30px
+}
+
+.bTri.two .text {
+	right: 30px
+}
+
+.bTri .text {
+	position: fixed;
+	top: calc(var(--bBtn-top) + 60px);
+	font-size: 32px;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.dpad {
+	margin-top: 35px;
+	display: flex;
+	flex-wrap: wrap;
+	width: 150px;
+	aspect-ratio: 1;
+	filter: drop-shadow(0px 0px 4px gray);
+}
+
+.dpad div {
+	flex: 0 0 33.3333%;
+	border: none;
+	font-size: 25px;
+	font-weight: bold;
+	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	filter: none !important;
+}
+
+div.btn,
+.dpad div.ctr {
+	background: #dadada;
+	filter: drop-shadow(0px 0px 4px gray);
+}
+
+div.btn.pressed {
+	background: #acacac;
+}
+
+.dpad div.btn#padUp {
+	border-radius: var(--dpad-radius) var(--dpad-radius) 0 0;
+}
+
+.dpad div.btn#padLeft {
+	border-radius: var(--dpad-radius) 0 0 var(--dpad-radius);
+}
+
+.dpad div.btn#padRight {
+	border-radius: 0 var(--dpad-radius) var(--dpad-radius) 0;
+}
+
+.dpad div.btn#padDown {
+	border-radius: 0 0 var(--dpad-radius) var(--dpad-radius);
+}
+
+#aBtn {
+	margin-top: 30px;
+	width: 150px;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 30px;
+}
+
+#homeRow {
+	margin-top: 20px;
+	width: 200px;
+	display: flex;
+	justify-content: space-between;
+}
+
+#homeRow div {
+	width: 30px;
+	aspect-ratio: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+}
+
+#homeRow div#homeBtn svg {
+	transform: scale(0.7);
+}
+
+#numBtns {
+	margin-top: 50px;
+	width: 50px;
+	height: 130px;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+#numBtns div {
+	width: 100%;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#lights {
+	margin-top: 50px;
+	width: 200px;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+#lights div {
+	width: 15px;
+	aspect-ratio: 1;
+	background-color: #8f8f8f;
+}
+
+#lights div.on {
+	background-color: #38f2ff;
+	box-shadow: 0 0 11px 2px #48c8ff;
+}
+
+#openFullScreenPrompt {
+	--padding: 15px;
+	display: flex;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: calc(100% - var(--padding) * 2);
+	height: calc(100% - var(--padding) * 2);
+	background-color: rgba(255, 255, 255, 0.8);
+	color: black;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	font-size: 1.2em;
+	gap: 1rem;
+	cursor: pointer;
+	z-index: 1000;
+	padding: var(--padding);
+}
+
+body:fullscreen #openFullScreenPrompt,
+html:fullscreen #openFullScreenPrompt {
+	display: none !important;
+}

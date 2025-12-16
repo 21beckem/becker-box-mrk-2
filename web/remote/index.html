@@ -1,76 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link href='https://fonts.googleapis.com/css?family=ADLaM Display' rel='stylesheet'>
-    <script src="https://unpkg.com/playroomkit/multiplayer.full.umd.js" crossorigin="anonymous"></script>
-    <title>Wii Remote Emulator</title>
-    <link rel="stylesheet" href="css/all.css">
-    <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<meta name="mobile-web-app-capable" content="yes">
+	<link rel="manifest" href="manifest.webmanifest">
+	<meta name="theme-color" content="#eaeaea" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<link rel="icon" type="image/png" href="img/logo.png">
+
+	<link href='https://fonts.googleapis.com/css?family=ADLaM Display' rel='stylesheet'>
+	<title>Wii Remote Emulator</title>
+	<link rel="stylesheet" href="css/all.css">
+	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div id="connectPage">
-        <center>
-            <h1 style="font-size: 45px; margin-top: 50px; margin-bottom: 10px;">BeckerBox<br>Remote</h1>
-            <p id="connectingText" style="margin-top: 40px; font-size: 20px;">Connecting to BeckerBox host<br><br>Please wait...</p>
-            <div id="connectForm" style="display: none;">
-                <p style="font-size: 20px; margin-bottom: 100px;">Connect to a Wii host</p>
-                <a style="font-size: 30px;">Game Code:</a>
-                <br>
-                <input type="text" id="gameCodeInput" inputmode="numeric" pattern="[0-9]*" placeholder="&#9679;&#9679;&#9679;&#9679;" autocomplete="off">
-                <br>
-                <div style="height: 40px;"></div>
-                <button class="wiiUIbtn" onclick="Remote.connectWithCode(_('gameCodeInput').value);">Connect</button>
-            </div>
-            <div style="height: 50px;"></div>
-        </center>
-    </div>
-    <div id="RemotePage" style="display: none;">
-        <div class="bTri one">
-            <div data-key="b" class="btn" id="bBtn1"></div>
-            <div class="text">B</div>
-        </div>
-        <div class="bTri two">
-            <div data-key="b" class="btn" id="bBtn2"></div>
-            <div class="text">B</div>
-        </div>
+	<section id="openFullScreenPrompt">
+		<button id="launchFullscreenBtn" class="wiiUIbtn">Launch</button>
+		<center>Fullscreen is required for BeckerBox remote. Press 'Launch' to start!</center>
+	</section>
+	<section id="connectPage">
+		<center>
+			<h1 style="font-size: 45px; margin-top: 50px; margin-bottom: 10px;">BeckerBox<br>Remote</h1>
+			<p id="connectingText" style="margin-top: 40px; font-size: 20px;">Connecting to BeckerBox host<br><br>Please
+				wait...</p>
+			<div style="height: 50px;"></div>
+		</center>
+	</section>
+	<section id="RemotePage" style="display: none;">
+		<div class="bTri one">
+			<div data-key="B" class="btn" id="bBtn1"></div>
+			<div class="text">B</div>
+		</div>
+		<div class="bTri two">
+			<div data-key="B" class="btn" id="bBtn2"></div>
+			<div class="text">B</div>
+		</div>
 
-        <div class="dpad">
-            <div></div>
-            <div data-key="u" class="btn" id="padUp"><i class="fa-solid fa-caret-up"></i></div>
-            <div></div>
-            <div data-key="l" class="btn" id="padLeft"><i class="fa-solid fa-caret-left"></i></div>
-            <div class="ctr"></div>
-            <div data-key="r" class="btn" id="padRight"><i class="fa-solid fa-caret-right"></i></div>
-            <div></div>
-            <div data-key="d" class="btn" id="padDown"><i class="fa-solid fa-caret-down"></i></div>
-            <div></div>
-        </div>
-    
-        <div data-key="a" class="btn" id="aBtn">A</div>
-    
-        <div id="homeRow">
-            <div data-key="-" class="btn" id="minsBtn">-</div>
-            <div data-key="H" class="btn" id="homeBtn"><i style="pointer-events: none; color:rgb(0,96,185)" class="fa-solid fa-house"></i></div>
-            <div data-key="+" class="btn" id="plusBtn">+</div>
-        </div>
-    
-        <div id="numBtns">
-            <div data-key="1" class="btn" id="1Btn">1</div>
-            <div data-key="2" class="btn" id="2Btn">2</div>
-        </div>
-    
-        <div id="lights">
-            <div id="light1"></div>
-            <div id="light2"></div>
-            <div id="light3"></div>
-            <div id="light4"></div>
-        </div>
+		<div class="dpad">
+			<div></div>
+			<div data-key="PadN" class="btn" id="padUp"><i class="fa-solid fa-caret-up"></i></div>
+			<div></div>
+			<div data-key="PadW" class="btn" id="padLeft"><i class="fa-solid fa-caret-left"></i></div>
+			<div class="ctr"></div>
+			<div data-key="PadE" class="btn" id="padRight"><i class="fa-solid fa-caret-right"></i></div>
+			<div></div>
+			<div data-key="PadS" class="btn" id="padDown"><i class="fa-solid fa-caret-down"></i></div>
+			<div></div>
+		</div>
 
-    </div>
-    
-    <script src="gui.js"></script>
-    <script src="remote.js"></script>
+		<div data-key="A" class="btn" id="aBtn">A</div>
+
+		<div id="homeRow">
+			<div data-key="Minus" class="btn" id="minsBtn">-</div>
+			<div data-key="Home" class="btn" id="homeBtn"><i style="pointer-events: none; color:rgb(0,96,185)"
+					class="fa-solid fa-house"></i></div>
+			<div data-key="Plus" class="btn" id="plusBtn">+</div>
+		</div>
+
+		<div id="numBtns">
+			<div data-key="One" class="btn" id="1Btn">1</div>
+			<div data-key="Two" class="btn" id="2Btn">2</div>
+		</div>
+
+		<div id="lights">
+			<div id="light1"></div>
+			<div id="light2"></div>
+			<div id="light3"></div>
+			<div id="light4"></div>
+		</div>
+
+	</section>
+
+	<script src="js/remote.js" type="module"></script>
 </body>
 </html>

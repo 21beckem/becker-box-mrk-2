@@ -19,7 +19,7 @@ const PlayerManager = new (class PlayerManager {
         console.log('Set QR code with ID:', id);
     }
     #initPeer() {
-        this.peer = new Peer(Date.now());
+        this.peer = new Peer('beckerbox');//Date.now());
         this.peer.on('open', (id) => {
             this.#setQrCode(id);
         });

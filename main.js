@@ -26,12 +26,29 @@ app.whenReady().then(() =>{
 
 // --- electron IPC handlers ---
 ipcMain.handle('sendPacket', (_event, slot, data) => {
-    console.log('got packet from:', slot, 'with data:', data);
-    return {
-        ok: true,
-        slot: slot,
-        timestamp: Date.now(),
-    };
+    try {
+        return PhoneMote.setPacket(slot, {
+            Home: data.Home,
+            Plus: data.Plus,
+            Minus: data.Minus,
+            A: data.A,
+            B: data.B,
+            One: data.One,
+            Two: data.Two,
+            PadN: data.PadN,
+            PadS: data.PadS,
+            PadE: data.PadE,
+            PadW: data.PadW,
+            AccelerometerX: data.AccelerometerX,
+            AccelerometerY: data.AccelerometerY,
+            AccelerometerZ: data.AccelerometerZ,
+            Gyroscope_Pitch: data.Gyroscope_Pitch,
+            Gyroscope_Yaw: data.Gyroscope_Yaw,
+            Gyroscope_Roll: data.Gyroscope_Roll
+        });
+    } catch (error) {
+        return false;
+    }
 });
 ipcMain.handle('addPlayer', (_event) => {
     return PhoneMote.connectNewPhone();
