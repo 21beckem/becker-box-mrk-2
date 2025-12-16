@@ -1,4 +1,5 @@
-import { PACKET } from './remote.js'
+import { PACKET } from './remote.js';
+let noSleep = new window.NoSleep();
 
 const _ = (x) => document.getElementById(x);
 class GUI {
@@ -36,6 +37,7 @@ class GUI {
 		});
 	}
 	static attemptFullscreen() {
+		noSleep.enable();
 		try {
 			let elem = document.documentElement;
 			if (elem.requestFullscreen) {
@@ -46,13 +48,6 @@ class GUI {
 				elem.webkitRequestFullscreen();
 			} else if (elem.msRequestFullscreen) {
 				elem.msRequestFullscreen();
-			}
-		} catch (e) { }
-
-		try {
-			// request wake lock too
-			if (navigator.requestWakeLock) {
-				navigator.wakeLock.request("screen");
 			}
 		} catch (e) { }
 	}
@@ -66,7 +61,7 @@ class GUI {
 		document.documentElement.style.setProperty('--bBtn-top', `${dist}px`);
 	}
 	static setSlot(s) {
-		_('lights').children.forEach(div => div.classList.remove('on'));
+		Array.from(_('lights').children).forEach(div => div.classList.remove('on'));
 		_('lights').children[s].classList.add('on');
 	}
 	static showRemotePage() {

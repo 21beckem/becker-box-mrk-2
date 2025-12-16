@@ -1,14 +1,13 @@
 import GUI from './gui.js';
 import { Peer } from 'https://esm.sh/peerjs@1.5.5?bundle-deps';
 const peer = new Peer(null);
-let lastPeerId = null;
 window.peer = peer;
 const status = {
 	connecting: 'Connecting to BeckerBox host<br><br>Please wait...',
 	connected: 'Connected!<br><br>Launching remote...',
 	cantconnect: 'Sorry, it looks something went wrong!<br><br>Please try scanning the QR code again.',
-	disconnected: 'Sorry, it looks like you got disconnected!<br><br>Please refresh to reconnect, or scan the QR code again.',
-	error: (err) => `There's been an error: ${err}`
+	disconnected: 'Sorry, it looks like you got disconnected!<br><br>Please <button class="wiiUIbtn" onclick="window.location.reload();" style="font-size: inherit; border-radius: 17px;">Refresh</button> to reconnect, or scan the QR code again.',
+	error: (err) => `There's been an error:<br>${err}`
 }
 
 const PACKET = {
@@ -70,7 +69,7 @@ class Remote {
 		this.conn.on('data', (data) => {
 			console.log('Received', data);
 			if (data.slot) {
-				GUI.setSlot(data.slot);
+				GUI.setSlot(data.slot + 1);
 			}
 		});
 		this.conn.on('disconnected', () => {
@@ -90,12 +89,11 @@ class Remote {
 		// start sending packets to the host
 		this.startSendingPackets();
 	}
-	static clamp = (x) => x.toFixed(2);
+	static clamp = (x) => (Number.isNaN(x) || x === null || x === undefined) ? 0 : x.toFixed(2);
 	static handleMotion(e) {
 		PACKET.AccelerometerX = this.clamp(e.acceleration.x);
 		PACKET.AccelerometerY = this.clamp(e.acceleration.y);
 		PACKET.AccelerometerZ = this.clamp(e.acceleration.z);
-		this.sendPacketNow();
 	}
 	static handleOrientation(e) {
 		PACKET.Gyroscope_Yaw = this.clamp(e.alpha);
@@ -114,6 +112,7 @@ class Remote {
 		}
 		window.addEventListener("devicemotion", (e) => this.handleMotion(e));
 		window.addEventListener("deviceorientation", (e) => this.handleOrientation(e));
+		setInterval(() => this.sendPacketNow(), 10);
 	}
 }
 Remote.init();

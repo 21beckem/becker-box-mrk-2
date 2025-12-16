@@ -324,7 +324,25 @@ const PhoneMote = new (class FONEMOTE {
     }
     setPacket(slot, data) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
-        this.server.controllerStates[slot].data = data;
+        this.server.controllerStates[slot].data = {
+            Home: (data.Home===undefined) ? current.Home : data.Home,
+            Plus: (data.Plus===undefined) ? current.Plus : data.Plus,
+            Minus: (data.Minus===undefined) ? current.Minus : data.Minus,
+            A: (data.A===undefined) ? current.A : data.A,
+            B: (data.B===undefined) ? current.B : data.B,
+            One: (data.One===undefined) ? current.One : data.One,
+            Two: (data.Two===undefined) ? current.Two : data.Two,
+            PadN: (data.PadN===undefined) ? current.PadN : data.PadN,
+            PadS: (data.PadS===undefined) ? current.PadS : data.PadS,
+            PadE: (data.PadE===undefined) ? current.PadE : data.PadE,
+            PadW: (data.PadW===undefined) ? current.PadW : data.PadW,
+            AccelerometerX: (data.AccelerometerX===undefined) ? current.AccelerometerX : data.AccelerometerX,
+            AccelerometerY: (data.AccelerometerY===undefined) ? current.AccelerometerY : data.AccelerometerY,
+            AccelerometerZ: (data.AccelerometerZ===undefined) ? current.AccelerometerZ : data.AccelerometerZ,
+            Gyroscope_Pitch: (data.Gyroscope_Pitch===undefined) ? current.Gyroscope_Pitch : data.Gyroscope_Pitch,
+            Gyroscope_Yaw: (data.Gyroscope_Yaw===undefined) ? current.Gyroscope_Yaw : data.Gyroscope_Yaw,
+            Gyroscope_Roll: (data.Gyroscope_Roll===undefined) ? current.Gyroscope_Roll : data.Gyroscope_Roll,
+        };
     }
     setDataAttr(slot, attr, val) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
@@ -333,6 +351,11 @@ const PhoneMote = new (class FONEMOTE {
     disconnect(slot) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
         this.server.controllerStates[slot].connectedState = 0;
+        this.server.controllerStates[slot].packetNumber = 0;
+        this.server.controllerStates[slot].data = {...DefaultControllerState.data};
+    }
+    clear() {
+        this.server.controllerStates.forEach((c, i) => this.disconnect(i));
     }
 })();
 

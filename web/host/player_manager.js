@@ -6,6 +6,9 @@ const PlayerManager = new (class PlayerManager {
     constructor() {
         this.players = [null, null, null, null];
         this.#initPeer();
+
+        // tell the backend that we are ready
+        window.electron.init();
     }
     #setQrCode(id, selector='#qrcode') {
         new QRCode(document.querySelector(selector), {

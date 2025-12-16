@@ -10,15 +10,15 @@ export default class Player {
         this.parent = parent;
         this.pointer = new Pointer(this.slot);
         this.#initConn();
+        setTimeout(() => this.conn.send({slot: this.slot}), 500);
 
         this.#restartDisconnectTimer();
     }
     #initConn() {
         this.conn.on('data', (data) => {
             this.#restartDisconnectTimer();
-            window.electron.sendPacket(this.slot, data)
+            window.electron.sendPacket(this.slot, data);
         });
-        this.conn.send(this.slot);
     }
     remove() {
         this.#disconnect();

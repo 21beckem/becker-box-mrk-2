@@ -42,8 +42,7 @@ body {
 	font-size: 30px;
 	letter-spacing: 1px;
 	color: #323232;
-	height: 60px;
-	width: 170px;
+	padding: 0.4rem 1rem;
 	border: solid black 2px;
 	border-radius: 20px;
 	background-color: white;
