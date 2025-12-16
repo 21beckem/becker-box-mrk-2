@@ -20,10 +20,9 @@ export default class Player {
             this.conn.send({slot: this.slot});
         })
         this.conn.on('data', (data) => {
-            data = this.#convertData(data);
             this.#restartDisconnectTimer();
 
-            this.pointer.newPacket(data);
+            this.pointer.newPacket( this.#convertData(data) );
             window.electron.sendPacket(this.slot, data);
         });
     }

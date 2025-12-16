@@ -18,7 +18,6 @@
     background-image: url('img/pointer_nums.png');
     mask-image: url('img/pointer_background.png');
     mask-composite: subtract;
-    /* transition: all 0.1s ease; */
 }
 .P1.pointer { background-position: 0px 0px; background-color: #1f8cfa; }
 .P2.pointer { background-position: 0px 66px; background-color: #f84a3c; }

@@ -1,5 +1,6 @@
 export default class Pointer {
     constructor(slot) {
+        this.slot = slot;
         this.states = {};
         this.pos = { x: 0, y: 0 };
         this.hoveredElements = [];
@@ -10,6 +11,8 @@ export default class Pointer {
         this.center();
     }
     clickAtPointer() {
+        console.log(`click! (${this.slot})`);
+        
         this.hoveredElements[0]?.click();
     }
     newPacket(data) {
@@ -18,7 +21,8 @@ export default class Pointer {
             -data.Gyroscope_Yaw,
             -data.Gyroscope_Pitch
         );
-        this.rotateTo(data.raw.Gyroscope_Roll);
+        if (data.raw)
+            this.rotateTo(data.raw.Gyroscope_Roll);
 
         // send button events
         if (data.A===1 && this.states.A===0)
