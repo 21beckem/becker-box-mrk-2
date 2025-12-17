@@ -309,10 +309,11 @@ class DSUServer {
 }
 
 
-const PhoneMote = new (class FONEMOTE {
-    constructor() {
+class FONEMOTE {
+    constructor(sendOnFixedInterval=false) {
+        this.sendOnFixedInterval = sendOnFixedInterval;
         this.server = new DSUServer('0.0.0.0', UDP_PORT);
-        this.server.start(false);
+        this.server.start(this.sendOnFixedInterval);
     }
     connectNewPhone() {
         let nextSlotNum = this.server.controllerStates.findIndex(c => c.connectedState === 0);
@@ -346,13 +347,15 @@ const PhoneMote = new (class FONEMOTE {
             Gyroscope_Roll: (data.Gyroscope_Roll===undefined) ? current.Gyroscope_Roll : data.Gyroscope_Roll,
         };
 
-        this.server.sendPacket( this.server.makeDataPacket(slot) );
+        if (!this.sendOnFixedInterval)
+            this.server.sendPacket( this.server.makeDataPacket(slot) );
     }
     setDataAttr(slot, attr, val) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
         this.server.controllerStates[slot].data[attr] = val;
         
-        this.server.sendPacket( this.server.makeDataPacket(slot) );
+        if (!this.sendOnFixedInterval)
+            this.server.sendPacket( this.server.makeDataPacket(slot) );
     }
     disconnect(slot) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
@@ -363,14 +366,14 @@ const PhoneMote = new (class FONEMOTE {
     clear() {
         this.server.controllerStates.forEach((c, i) => this.disconnect(i));
     }
-})();
-
-export default PhoneMote;
+}
+export default FONEMOTE;
 
 
 
 // --- test code ---
 function testCode() {
+    let PhoneMote = new FONEMOTE();
     let slot = PhoneMote.connectNewPhone();
     console.log('Slot', slot);
 
