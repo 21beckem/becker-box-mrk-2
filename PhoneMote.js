@@ -86,13 +86,14 @@ class DSUServer {
         0x110002: '(Unofficial) Rumble controller motor'              // unofficial
     };
 
-    start() {
+    start(keepSendingData) {
         // Bind the socket
         this.serverSocket.bind(this.port, this.host, () => {
             console.log(`DSU server is running on ${this.host}:${this.port}`);
         });
 
-        this.keepSendingData();
+        if (keepSendingData)
+            this.keepSendingData();
 
         // Main receive loop
         this.serverSocket.on('message', (message, rinfo) => {
@@ -198,8 +199,8 @@ class DSUServer {
         out[31] = 0x00; // termination byte per Arduino code
 
         // Compute CRC32 over the full 32 bytes (with CRC bytes still zero) and write LE uint32 into bytes 8..11
-        const checksum = crc32(out);
-        out.writeUInt32LE(checksum >>> 0, 8);
+        // const checksum = crc32(out);
+        // out.writeUInt32LE(checksum >>> 0, 8);
 
         return out;
     }
@@ -295,8 +296,8 @@ class DSUServer {
         out.writeFloatLE(c.data.Gyroscope_Roll, 96);
 
         // Compute CRC32 over full 100 bytes (CRC field still zero) and write to bytes 8..11 LE
-        const checksum = crc32(out);
-        out.writeUInt32LE(checksum >>> 0, 8);
+        // const checksum = crc32(out);
+        // out.writeUInt32LE(checksum >>> 0, 8);
 
         return out;
     }
@@ -311,7 +312,7 @@ class DSUServer {
 const PhoneMote = new (class FONEMOTE {
     constructor() {
         this.server = new DSUServer('0.0.0.0', UDP_PORT);
-        this.server.start();
+        this.server.start(false);
     }
     connectNewPhone() {
         let nextSlotNum = this.server.controllerStates.findIndex(c => c.connectedState === 0);
@@ -324,6 +325,7 @@ const PhoneMote = new (class FONEMOTE {
     }
     setPacket(slot, data) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
+        const current = this.server.controllerStates[slot].data;
         this.server.controllerStates[slot].data = {
             Home: (data.Home===undefined) ? current.Home : data.Home,
             Plus: (data.Plus===undefined) ? current.Plus : data.Plus,
@@ -343,10 +345,14 @@ const PhoneMote = new (class FONEMOTE {
             Gyroscope_Yaw: (data.Gyroscope_Yaw===undefined) ? current.Gyroscope_Yaw : data.Gyroscope_Yaw,
             Gyroscope_Roll: (data.Gyroscope_Roll===undefined) ? current.Gyroscope_Roll : data.Gyroscope_Roll,
         };
+
+        this.server.sendPacket( this.server.makeDataPacket(slot) );
     }
     setDataAttr(slot, attr, val) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
         this.server.controllerStates[slot].data[attr] = val;
+        
+        this.server.sendPacket( this.server.makeDataPacket(slot) );
     }
     disconnect(slot) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;

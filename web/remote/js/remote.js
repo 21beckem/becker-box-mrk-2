@@ -127,29 +127,36 @@ class Remote {
 		// PACKET.AccelerometerX = this.clamp(e.acceleration.x) - PACKET.AccelerometerX;
 		// PACKET.AccelerometerY = this.clamp(e.acceleration.y) - PACKET.AccelerometerY;
 		// PACKET.AccelerometerZ = this.clamp(e.acceleration.z) - PACKET.AccelerometerZ;
-		PACKET.AccelerometerX = this.clamp(e.acceleration.x);
-		PACKET.AccelerometerY = this.clamp(e.acceleration.y);
-		PACKET.AccelerometerZ = this.clamp(e.acceleration.z);
-		// PACKET.AccelerometerX = this.applyCalibration(e.acceleration.x, this.calibration.AccelerometerX);
-		// PACKET.AccelerometerY = this.applyCalibration(e.acceleration.y, this.calibration.AccelerometerY);
-		// PACKET.AccelerometerZ = this.applyCalibration(e.acceleration.z, this.calibration.AccelerometerZ);
+		// PACKET.AccelerometerX = this.clamp(e.acceleration.x);
+		// PACKET.AccelerometerY = this.clamp(e.acceleration.y);
+		// PACKET.AccelerometerZ = this.clamp(e.acceleration.z);
+		PACKET.AccelerometerX = this.applyCalibration(e.acceleration.x, this.calibration.AccelerometerX);
+		PACKET.AccelerometerY = this.applyCalibration(e.acceleration.y, this.calibration.AccelerometerY);
+		PACKET.AccelerometerZ = this.applyCalibration(e.acceleration.z, this.calibration.AccelerometerZ);
 	}
 	static handleOrientation(e) {
 		// PACKET.Gyroscope_Yaw = this.clamp(e.alpha) - PACKET.Gyroscope_Yaw;
 		// PACKET.Gyroscope_Pitch = this.clamp(e.beta) - PACKET.Gyroscope_Pitch;
 		// PACKET.Gyroscope_Roll = this.clamp(e.gamma) - PACKET.Gyroscope_Roll;
-		PACKET.Gyroscope_Yaw = this.clamp(e.alpha);
-		PACKET.Gyroscope_Pitch = this.clamp(e.beta);
-		PACKET.Gyroscope_Roll = this.clamp(e.gamma);
-		// PACKET.Gyroscope_Yaw = this.applyCalibration(e.alpha, this.calibration.Gyroscope_Yaw);
-		// PACKET.Gyroscope_Pitch = this.applyCalibration(e.beta, this.calibration.Gyroscope_Pitch);
-		// PACKET.Gyroscope_Roll = this.applyCalibration(e.gamma, this.calibration.Gyroscope_Roll) - 180;
+		// PACKET.Gyroscope_Yaw = this.clamp(e.alpha);
+		// PACKET.Gyroscope_Pitch = this.clamp(e.beta);
+		// PACKET.Gyroscope_Roll = this.clamp(e.gamma);
+		PACKET.Gyroscope_Yaw = this.applyCalibration(e.alpha, this.calibration.Gyroscope_Yaw);
+		PACKET.Gyroscope_Pitch = this.applyCalibration(e.beta, this.calibration.Gyroscope_Pitch);
+		PACKET.Gyroscope_Roll = this.applyCalibration(e.gamma, this.calibration.Gyroscope_Roll) - 180;
 	}
 	static sendPacketNow() {
 		if (peer && !peer.disconnected && this.conn && this.conn.open) {
-			this.conn.send(PACKET)
+			this.conn.send(this.adjustPacketBeforeSending(PACKET));
 			// console.log('sent packet');
 		}
+	}
+	static adjustPacketBeforeSending(data) {
+		data = { ...data };
+		data.Gyroscope_Pitch = data.Gyroscope_Pitch > 180 ? data.Gyroscope_Pitch - 360 : data.Gyroscope_Pitch;
+		data.Gyroscope_Yaw = data.Gyroscope_Yaw - 180;
+		data.Gyroscope_Roll = data.Gyroscope_Roll > 0 ? data.Gyroscope_Roll - 180 : data.Gyroscope_Roll + 180;
+		return data;
 	}
 	static startSendingPackets() {
 		if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
@@ -176,4 +183,4 @@ class Remote {
 }
 Remote.init();
 
-export { PACKET };
+export { PACKET, Remote };
