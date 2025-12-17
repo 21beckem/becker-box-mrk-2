@@ -37,8 +37,7 @@ ipcMain.handle('init', (_event) => {
 });
 ipcMain.handle('sendPacket', (_event, slot, data) => {
     try {
-        printClean(data.Gyroscope_Yaw);
-          
+        // printClean(data.Gyroscope_Yaw);
         return PhoneMote.setPacket(slot, data);
     } catch (error) {
         return false;

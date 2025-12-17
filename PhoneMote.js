@@ -1,4 +1,30 @@
 import dgram from 'dgram';
+import fs from 'fs';
+
+class logger {
+    static enabled = true;
+    static fileName = 'logs/' + (new Date()).toISOString().replace('T','_').slice(0,-5) + '.log';
+    static string(msg) {
+        if (!this.enabled) return;
+        fs.appendFileSync(this.fileName, `\n${msg}`, (err) => {
+            if (err) console.error('Error writing to log file:', err);
+        });
+    }
+    static packet(buf) {
+        buf = Buffer.from(buf);
+        if (!this.enabled) return;
+        let magic = buf.toString('ascii', 0, 4);
+        let protocolVersion = buf.readUInt16LE(4);
+        let messageLength = buf.readUInt16LE(6);
+        let crc = buf.readUInt32LE(8);
+        let encodedMsgType = buf.readUInt32LE(16);
+        let packetData = buf.slice(20);
+
+        let logMessage = `type: ${encodedMsgType.toString(16).padStart(8, '0')} | crc: ${crc.toString(16).padStart(8, '0')} | message: ${JSON.stringify(Array.from(Buffer.concat([response1, packetData])))}`;
+        this.string(JSON.stringify(msg));
+    }
+}
+
 
 // Config (match Arduino defaults)
 const UDP_PORT = 26760;
@@ -199,8 +225,8 @@ class DSUServer {
         out[31] = 0x00; // termination byte per Arduino code
 
         // Compute CRC32 over the full 32 bytes (with CRC bytes still zero) and write LE uint32 into bytes 8..11
-        // const checksum = crc32(out);
-        // out.writeUInt32LE(checksum >>> 0, 8);
+        const checksum = crc32(out);
+        out.writeUInt32LE(checksum >>> 0, 8);
 
         return out;
     }
@@ -296,8 +322,8 @@ class DSUServer {
         out.writeFloatLE(c.data.Gyroscope_Roll, 96);
 
         // Compute CRC32 over full 100 bytes (CRC field still zero) and write to bytes 8..11 LE
-        // const checksum = crc32(out);
-        // out.writeUInt32LE(checksum >>> 0, 8);
+        const checksum = crc32(out);
+        out.writeUInt32LE(checksum >>> 0, 8);
 
         return out;
     }
