@@ -29,10 +29,30 @@ const PACKET = {
 	Gyroscope_Yaw: 0.0,
 	Gyroscope_Roll: 0.0
 }
+function getCalibrationFromStorage() {
+	// if (localStorage.getItem('BeckerBoxRemoteCalibration')) {
+	// 	try {
+	// 		return JSON.parse(localStorage.getItem('BeckerBoxRemoteCalibration'));
+	// 	} catch (e) { }
+	// }
+	return {
+		AccelerometerX: 0.0,
+		AccelerometerY: 0.0,
+		AccelerometerZ: 0.0,
+		Gyroscope_Pitch: 0.0,
+		Gyroscope_Yaw: 0.0,
+		Gyroscope_Roll: 0.0
+	}
+}
+function saveCalibrationToStorage(calibration) {
+	localStorage.setItem('BeckerBoxRemoteCalibration', JSON.stringify(calibration));
+}
 
 class Remote {
+	static calibration = getCalibrationFromStorage();
 	static searchParams = new URLSearchParams(window.location.search)
 	static init() {
+		GUI.setRemote(this);
 		GUI.setConnectingStatus(status.connecting);
 		peer.on('open', () => {
 			// attempt to connect
@@ -89,7 +109,14 @@ class Remote {
 		// start sending packets to the host
 		this.startSendingPackets();
 	}
-	static clamp = (x) => (Number.isNaN(x) || x === null || x === undefined) ? 0 : x; // Math.round(x * 100) / 100;
+	static clamp = (x) => (x === null || x === undefined) ? 0 : x; // Math.round(x * 100) / 100;
+	static applyCalibration = (x, calibration) => {
+		x = this.clamp(x);
+		if (x - calibration < 0)
+			return (x - calibration) + 360;
+		else
+			return x - calibration;
+	}
 	static handleMotion(e) {
 		// alert([
 		// 	e.acceleration.x,
@@ -103,6 +130,9 @@ class Remote {
 		PACKET.AccelerometerX = this.clamp(e.acceleration.x);
 		PACKET.AccelerometerY = this.clamp(e.acceleration.y);
 		PACKET.AccelerometerZ = this.clamp(e.acceleration.z);
+		// PACKET.AccelerometerX = this.applyCalibration(e.acceleration.x, this.calibration.AccelerometerX);
+		// PACKET.AccelerometerY = this.applyCalibration(e.acceleration.y, this.calibration.AccelerometerY);
+		// PACKET.AccelerometerZ = this.applyCalibration(e.acceleration.z, this.calibration.AccelerometerZ);
 	}
 	static handleOrientation(e) {
 		// PACKET.Gyroscope_Yaw = this.clamp(e.alpha) - PACKET.Gyroscope_Yaw;
@@ -111,6 +141,9 @@ class Remote {
 		PACKET.Gyroscope_Yaw = this.clamp(e.alpha);
 		PACKET.Gyroscope_Pitch = this.clamp(e.beta);
 		PACKET.Gyroscope_Roll = this.clamp(e.gamma);
+		// PACKET.Gyroscope_Yaw = this.applyCalibration(e.alpha, this.calibration.Gyroscope_Yaw);
+		// PACKET.Gyroscope_Pitch = this.applyCalibration(e.beta, this.calibration.Gyroscope_Pitch);
+		// PACKET.Gyroscope_Roll = this.applyCalibration(e.gamma, this.calibration.Gyroscope_Roll) - 180;
 	}
 	static sendPacketNow() {
 		if (peer && !peer.disconnected && this.conn && this.conn.open) {
@@ -125,6 +158,20 @@ class Remote {
 		window.addEventListener("devicemotion", (e) => this.handleMotion(e));
 		window.addEventListener("deviceorientation", (e) => this.handleOrientation(e));
 		setInterval(() => this.sendPacketNow(), 10);
+	}
+
+	static calibrate() {
+		if (confirm('Please place the remote on a flat surface facing directly towards the BeckerBox screen. Then press OK to calibrate.')) {
+			this.calibration = {
+				AccelerometerX: PACKET.AccelerometerX,
+				AccelerometerY: PACKET.AccelerometerY,
+				AccelerometerZ: PACKET.AccelerometerZ,
+				Gyroscope_Pitch: PACKET.Gyroscope_Pitch,
+				Gyroscope_Yaw: PACKET.Gyroscope_Yaw,
+				Gyroscope_Roll: PACKET.Gyroscope_Roll
+			}
+			saveCalibrationToStorage(this.calibration);
+		}
 	}
 }
 Remote.init();

@@ -30,6 +30,8 @@ ipcMain.handle('init', (_event) => {
 });
 ipcMain.handle('sendPacket', (_event, slot, data) => {
     try {
+        // console.log(JSON.stringify(data));
+        
         return PhoneMote.setPacket(slot, data);
     } catch (error) {
         return false;

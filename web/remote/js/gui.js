@@ -4,8 +4,11 @@ let noSleep = new window.NoSleep();
 const _ = (x) => document.getElementById(x);
 class GUI {
 	static b_states = [0, 0];
+	static Remote = null;
+	static setRemote(remote) { this.Remote = remote; }
 	static init() {
-		_('launchFullscreenBtn').addEventListener('click', this.attemptFullscreen)
+		_('launchFullscreenBtn').addEventListener('click', this.attemptFullscreen);
+		_('calibrateBtn').addEventListener('click', () => this.Remote.calibrate());
 		this.setBposition();
 		window.addEventListener('resize', this.setBposition);
 
