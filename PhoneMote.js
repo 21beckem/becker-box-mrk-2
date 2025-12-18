@@ -1,5 +1,6 @@
 import dgram from 'dgram';
 import fs from 'fs';
+import * as MyAttempt from './my-attempt.js';
 
 class logger {
     static enabled = true;
@@ -192,6 +193,8 @@ class DSUServer {
         this.sendPacket(finalPacket);
     }
     makeInfoPacket(slotNumber) {
+        return MyAttempt.createTestInfoPacket();
+        
         const out = Buffer.alloc(INFO_PACKET_TOTAL, 0);
 
         // Magic "DSUS"
