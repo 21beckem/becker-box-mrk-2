@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import FONEMOTE from './PhoneMote.js';
-const PhoneMote = new FONEMOTE(true);
+const PhoneMote = new FONEMOTE(false);
 
 // --- init electron app ---
 const __filename = fileURLToPath(import.meta.url);

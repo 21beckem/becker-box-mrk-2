@@ -119,7 +119,7 @@ class DSUServer {
 
                     case 'Actual controllers data':
                         let slot = msgData.readUInt8(1);
-                        this.sendPacket( this.makeDataPacket(slot) );
+                        // this.sendPacket( this.makeDataPacket(slot) );
                         break;
 
                     case '(Unofficial) Information about controller motors':
@@ -201,6 +201,9 @@ class DSUServer {
         out[23] = 0x02; // connection type bluetooth (2)
         // MAC
         for (let i = 0; i < 6; i++) out[24 + i] = macAddress[i] & 0xFF;
+        // set first byte of mac to slot number
+        out[24] = slotNumber & 0xFF;
+
         out[30] = 0x05; // battery full
         out[31] = 0x00; // termination byte per Arduino code
 
@@ -253,33 +256,33 @@ class DSUServer {
         out.writeUInt32LE(packetCount >>> 0, 32);
 
         
-        // // ---------- BUTTONS / STICKS / ANALOGS REGION: offsets 36..55 ----------
-        // const bOff = 36;
-        // out[bOff + 0] = 0x00 & 0xFF;                            // Byte1
-        // out[bOff + 1] = 0x00 & 0xFF;                            // Byte2
-        // out[bOff + 2] = (c.data.Home ? 0x01 : 0x00) & 0xFF;     // Home
-        // out[bOff + 3] = 0x00 & 0xFF;                            // Touch
+        // ---------- BUTTONS / STICKS / ANALOGS REGION: offsets 36..55 ----------
+        const bOff = 36;
+        out[bOff + 0] = 0x00 & 0xFF;                            // Byte1
+        out[bOff + 1] = 0x00 & 0xFF;                            // Byte2
+        out[bOff + 2] = (c.data.Home ? 0x01 : 0x00) & 0xFF;     // Home
+        out[bOff + 3] = 0x00 & 0xFF;                            // Touch
 
-        // out[bOff + 4] = 128 & 0xFF;                             // leftStickX
-        // out[bOff + 5] = 128 & 0xFF;                             // leftStickY
-        // out[bOff + 6] = 128 & 0xFF;                             // rightStickX
-        // out[bOff + 7] = 128 & 0xFF;                             // rightStickY
+        out[bOff + 4] = 128 & 0xFF;                             // leftStickX
+        out[bOff + 5] = 128 & 0xFF;                             // leftStickY
+        out[bOff + 6] = 128 & 0xFF;                             // rightStickX
+        out[bOff + 7] = 128 & 0xFF;                             // rightStickY
 
-        // out[bOff + 8] = (c.data.PadW ? 255 : 0) & 0xFF;         // analogDpadLeft
-        // out[bOff + 9] = (c.data.PadS ? 255 : 0) & 0xFF;         // analogDpadDown
-        // out[bOff +10] = (c.data.PadE ? 255 : 0) & 0xFF;         // analogDpadRight
-        // out[bOff +11] = (c.data.PadN ? 255 : 0) & 0xFF;         // analogDpadUp
+        out[bOff + 8] = (c.data.PadW ? 255 : 0) & 0xFF;         // analogDpadLeft
+        out[bOff + 9] = (c.data.PadS ? 255 : 0) & 0xFF;         // analogDpadDown
+        out[bOff +10] = (c.data.PadE ? 255 : 0) & 0xFF;         // analogDpadRight
+        out[bOff +11] = (c.data.PadN ? 255 : 0) & 0xFF;         // analogDpadUp
 
-        // out[bOff +12] = (c.data.A ? 255 : 0) & 0xFF;            // analogY (up)
-        // out[bOff +13] = (c.data.B ? 255 : 0) & 0xFF;            // analogB (right)
-        // out[bOff +14] = (c.data.One ? 255 : 0) & 0xFF;          // analogA (down)
-        // out[bOff +15] = (c.data.Two ? 255 : 0) & 0xFF;          // analogX (left)
+        out[bOff +12] = (c.data.A ? 255 : 0) & 0xFF;            // analogY (up)
+        out[bOff +13] = (c.data.B ? 255 : 0) & 0xFF;            // analogB (right)
+        out[bOff +14] = (c.data.One ? 255 : 0) & 0xFF;          // analogA (down)
+        out[bOff +15] = (c.data.Two ? 255 : 0) & 0xFF;          // analogX (left)
 
-        // out[bOff +16] = (c.data.Plus ? 255 : 0)  & 0xFF;        // analogR1
-        // out[bOff +17] = (c.data.Minus ? 255 : 0) & 0xFF;        // analogL1
-        // out[bOff +18] = 0 & 0xFF;                               // analogR2
-        // out[bOff +19] = 0 & 0xFF;                               // analogL2
-        // // ---------- end buttons region ----------
+        out[bOff +16] = (c.data.Plus ? 255 : 0)  & 0xFF;        // analogR1
+        out[bOff +17] = (c.data.Minus ? 255 : 0) & 0xFF;        // analogL1
+        out[bOff +18] = 0 & 0xFF;                               // analogR2
+        out[bOff +19] = 0 & 0xFF;                               // analogL2
+        // ---------- end buttons region ----------
 
         // Timestamp: Arduino places 4 lower bytes at offset 68 and zeros the higher 4 bytes at 72..75
         out.writeUInt32LE(timestamp32 >>> 0, 68);
@@ -313,13 +316,20 @@ class DSUServer {
             console.warn('crc32 mismatch', checksum, checksum2);
         out.writeUInt32LE(checksum >>> 0, 8);
 
-        logger.logPacket(out);
+        // logger.logPacket(out);
 
         return out;
     }
-    sendPacket(packet) {
+    sendPacket(packet, sendSecondPacket=false) {
         if (!this.clientAddress) return;
         
+        this.serverSocket.send(packet, 0, packet.length, this.clientAddress.port, this.clientAddress.address, (err) => {
+            if (err) console.warn('Failed to send info packet:', err);
+        });
+
+
+        if (!sendSecondPacket) return;
+        packet.writeUInt32LE(4239745322 >>> 0, 8);  // fcb5612a
         this.serverSocket.send(packet, 0, packet.length, this.clientAddress.port, this.clientAddress.address, (err) => {
             if (err) console.warn('Failed to send info packet:', err);
         });
@@ -366,7 +376,7 @@ class FONEMOTE {
         };
 
         if (!this.sendOnFixedInterval) {
-            this.server.sendPacket( this.server.makeDataPacket(slot) );
+            this.server.sendPacket( this.server.makeDataPacket(slot, true) );
         }
     }
     setDataAttr(slot, attr, val) {
@@ -374,7 +384,7 @@ class FONEMOTE {
         this.server.controllerStates[slot].data[attr] = val;
         
         if (!this.sendOnFixedInterval) {
-            this.server.sendPacket( this.server.makeDataPacket(slot) );
+            this.server.sendPacket( this.server.makeDataPacket(slot, true) );
         }
     }
     disconnect(slot) {
