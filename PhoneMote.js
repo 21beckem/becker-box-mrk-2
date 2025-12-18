@@ -340,22 +340,26 @@ class DSUServer {
 class FONEMOTE {
     constructor(sendOnFixedInterval=false) {
         this.sendOnFixedInterval = sendOnFixedInterval;
-        this.server = new DSUServer('0.0.0.0', UDP_PORT);
-        this.server.start(this.sendOnFixedInterval);
+        this.servers = [];
+        for (let i = 0; i < 4; i++) {
+            let server = new DSUServer('0.0.0.0', 26760 + i);
+            server.start(this.sendOnFixedInterval);
+            this.servers.push(server);
+        }
     }
     connectNewPhone() {
-        let nextSlotNum = this.server.controllerStates.findIndex(c => c.connectedState === 0);
+        let nextSlotNum = this.servers.findIndex(s => s.controllerStates[0].connectedState === 0);
         if (nextSlotNum === -1) return console.warn('No free slots');
 
-        let nextSlot = this.server.controllerStates[nextSlotNum];
-        nextSlot.connectedState = 2;
+        this.servers[nextSlotNum].controllerStates[0].connectedState = 2;
 
         return nextSlotNum;
     }
     setPacket(slot, data) {
-        if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
-        const current = this.server.controllerStates[slot].data;
-        this.server.controllerStates[slot].data = {
+        if (!this.servers[slot] || this.servers[slot].controllerStates[0].connectedState === 0) return;
+        const current = this.servers[slot].controllerStates[0].data;
+
+        this.servers[slot].controllerStates[0].data = {
             Home: (data.Home===undefined) ? current.Home : data.Home,
             Plus: (data.Plus===undefined) ? current.Plus : data.Plus,
             Minus: (data.Minus===undefined) ? current.Minus : data.Minus,
@@ -376,25 +380,26 @@ class FONEMOTE {
         };
 
         if (!this.sendOnFixedInterval) {
-            this.server.sendPacket( this.server.makeDataPacket(slot, true) );
+            this.servers[slot].sendPacket( this.servers[slot].makeDataPacket(0) );
         }
     }
     setDataAttr(slot, attr, val) {
-        if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
-        this.server.controllerStates[slot].data[attr] = val;
+        if (!this.servers[slot] || this.servers[slot].controllerStates[0].connectedState === 0) return;
+        this.servers[slot].controllerStates[0].data[attr] = val;
         
         if (!this.sendOnFixedInterval) {
-            this.server.sendPacket( this.server.makeDataPacket(slot, true) );
+            this.servers[slot].sendPacket( this.servers[slot].makeDataPacket(0) );
         }
     }
     disconnect(slot) {
-        if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
-        this.server.controllerStates[slot].connectedState = 0;
-        this.server.controllerStates[slot].packetNumber = 0;
-        this.server.controllerStates[slot].data = {...DefaultControllerState.data};
+        if (!this.servers[slot] || this.servers[slot].controllerStates[0].connectedState === 0) return;
+        
+        this.servers[slot].controllerStates[0].connectedState = 0;
+        this.servers[slot].controllerStates[0].packetNumber = 0;
+        this.servers[slot].controllerStates[0].data = {...DefaultControllerState.data};
     }
     clear() {
-        this.server.controllerStates.forEach((c, i) => this.disconnect(i));
+        this.servers.forEach((s,i) => this.disconnect(i));
     }
 }
 export default FONEMOTE;
