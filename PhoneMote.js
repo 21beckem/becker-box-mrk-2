@@ -228,6 +228,9 @@ class DSUServer {
         const checksum = crc32(out);
         out.writeUInt32LE(checksum >>> 0, 8);
 
+
+        console.log('info packet', JSON.stringify(Array.from(out)) );
+
         return out;
     }
     makeDataPacket(slotNumber) {
@@ -328,6 +331,8 @@ class DSUServer {
         return out;
     }
     sendPacket(packet) {
+        if (!this.clientAddress) return;
+        
         this.serverSocket.send(packet, 0, packet.length, this.clientAddress.port, this.clientAddress.address, (err) => {
             if (err) console.warn('Failed to send info packet:', err);
         });
@@ -399,12 +404,13 @@ export default FONEMOTE;
 
 // --- test code ---
 function testCode() {
-    let PhoneMote = new FONEMOTE();
+    let PhoneMote = new FONEMOTE(false);
     let slot = PhoneMote.connectNewPhone();
     console.log('Slot', slot);
+    PhoneMote.server.makeInfoPacket(slot);
 
     // Push A
-    pushA(PhoneMote.server, slot, false);
+    pushA(PhoneMote, slot, false);
 
     // Make gyroscope roll with sin wave
     let offset = 0;
@@ -413,10 +419,10 @@ function testCode() {
         offset = (offset + 1);
     }, 7);
 }
-async function pushA(server, slot, val) {  // Push / release A every second
+async function pushA(PhoneMote, slot, val) {  // Push / release A every second
     console.log('Setting A to:', val);
     
     PhoneMote.setDataAttr(slot, 'A', val?1:0);
-    setTimeout(() => pushA(server, slot, !val), 1000);
+    setTimeout(() => pushA(PhoneMote, slot, !val), 1000);
 }
-if (import.meta.main) testCode();
+testCode();
