@@ -1,18 +1,22 @@
 import fs from 'fs';
 export default class Logger {
-    constructor(enabled=true) {
-        this.enabled = enabled;
+    constructor(mode='terminal') {
+        this.mode = mode;
         this.fileName = 'logs/' + (new Date()).toISOString().replace('T','_').slice(0,-5) + '.log';
     }
-    string(msg) {
-        if (!this.enabled) return;
+    logString(msg) {
+        if (this.mode === 'terminal') return console.log(msg);
+
         fs.appendFileSync(this.fileName, `\n${msg}`, (err) => {
             if (err) console.error('Error writing to log file:', err);
         });
     }
-    packet(buf) {
+    logObject(obj) {
+        if (this.mode === 'terminal') return console.log(obj);
+        else this.logString(JSON.stringify(obj));
+    }
+    logPacket(buf) {
         buf = Buffer.from(buf);
-        if (!this.enabled) return;
         let p = {
             magicString: buf.toString('ascii', 0, 4),
             protocolVersion: buf.readUInt16LE(4),
@@ -31,9 +35,9 @@ export default class Logger {
         // let packetData = buf.slice(20);
 
         // let logMessage = `type: ${encodedMsgType.toString(16).padStart(8, '0')} | crc: ${crc.toString(16).padStart(8, '0')} | message: ${JSON.stringify(Array.from(Buffer.concat([response1, packetData])))}`;
-        // this.string(JSON.stringify(msg));
+        // this.logString(JSON.stringify(msg));
 
-        console.log(p);
+        this.logObject(p);
     }
     #breakPayload(msgType, payload) {
         switch (msgType) {
@@ -92,12 +96,15 @@ export default class Logger {
     }
 }
 
-const logger = new Logger(true);
-
-// Example usage
-const response1 = Buffer.from(
-    [68,83,85,83,233,3,15,0,46,85,192,63,1,0,0,0,1,0,16,0,0,2,2,2,0,0,0,0,0,0,5]
-    // [68,83,85,83,233,3,16,0,179,20,52,76,0,0,0,0,1,0,16,0,0,2,2,2,0,0,0,0,0,0,5,0]
-    // [68,83,85,83,233,3,84,0,221,191,28,107,0,0,0,0,2,0,16,0,0,2,2,2,0,0,0,0,0,0,5,1,239,0,0,0,0,0,0,0,128,128,128,128,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,213,225,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,99,54,194]
-);
-logger.packet(response1);
+function testCode() {
+    const logger = new Logger();
+    
+    // Example usage
+    const response1 = Buffer.from(
+        [68,83,85,83,233,3,15,0,46,85,192,63,1,0,0,0,1,0,16,0,0,2,2,2,0,0,0,0,0,0,5]
+        // [68,83,85,83,233,3,16,0,179,20,52,76,0,0,0,0,1,0,16,0,0,2,2,2,0,0,0,0,0,0,5,0]
+        // [68,83,85,83,233,3,84,0,221,191,28,107,0,0,0,0,2,0,16,0,0,2,2,2,0,0,0,0,0,0,5,1,239,0,0,0,0,0,0,0,128,128,128,128,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,213,225,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,99,54,194]
+    );
+    logger.logPacket(response1);
+}
+if (import.meta.main) testCode();

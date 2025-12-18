@@ -20,22 +20,22 @@ export function createTestInfoPacket() {
     return (crc ^ 0xFFFFFFFF) >>> 0;
     }
 
-    let p = Buffer.alloc(31);
+    let p = Buffer.alloc(32, 0);
 
     p.write('DSUS', 0, 4, 'ascii');  // magic string
     p.writeUInt16LE(1001, 4);        // protocol version
-    p.writeUInt16LE(15, 6);          // packet length without header
-    p.writeUInt32LE(0, 8);           // CRC32 placeholder
-    p.writeUInt32LE(1, 12);          // server id
+    p.writeUInt16LE(16, 6);          // packet length without header
+    // crc left zero for now
+    p.writeUInt32LE(0, 12);          // server id
 
-    p.writeUInt32LE(0x100001, 16);   // event type (include in packet length)
+    p.writeUInt32LE(0x00100001, 16);   // event type (include in packet length)
 
     p.writeUInt8(0, 20);             // slot number
-    p.writeUInt8(2, 21);             // slot state
+    p.writeUInt8(0, 21);             // slot state
     p.writeUInt8(2, 22);             // device model (2=full gyro)
     p.writeUInt8(2, 23);             // connection type (2=bluetooth)
     // mac address (leaving it zeroed out) (length=6)
-    p.writeUInt8(0x05, 30);          // battery level (5=full)
+    p.writeUInt8(5, 30);          // battery level (5=full)
 
     // Calculate and write CRC32
     let crc = crc32(p);

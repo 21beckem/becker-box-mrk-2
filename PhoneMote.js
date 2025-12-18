@@ -1,30 +1,7 @@
 import dgram from 'dgram';
-import fs from 'fs';
-import * as MyAttempt from './my-attempt.js';
-
-class logger {
-    static enabled = true;
-    static fileName = 'logs/' + (new Date()).toISOString().replace('T','_').slice(0,-5) + '.log';
-    static string(msg) {
-        if (!this.enabled) return;
-        fs.appendFileSync(this.fileName, `\n${msg}`, (err) => {
-            if (err) console.error('Error writing to log file:', err);
-        });
-    }
-    static packet(buf) {
-        buf = Buffer.from(buf);
-        if (!this.enabled) return;
-        let magic = buf.toString('ascii', 0, 4);
-        let protocolVersion = buf.readUInt16LE(4);
-        let messageLength = buf.readUInt16LE(6);
-        let crc = buf.readUInt32LE(8);
-        let encodedMsgType = buf.readUInt32LE(16);
-        let packetData = buf.slice(20);
-
-        let logMessage = `type: ${encodedMsgType.toString(16).padStart(8, '0')} | crc: ${crc.toString(16).padStart(8, '0')} | message: ${JSON.stringify(Array.from(Buffer.concat([response1, packetData])))}`;
-        this.string(JSON.stringify(msg));
-    }
-}
+import * as zlib from 'zlib';
+import Logger from './Logger.js';
+const logger = new Logger();
 
 
 // Config (match Arduino defaults)
@@ -193,7 +170,7 @@ class DSUServer {
         this.sendPacket(finalPacket);
     }
     makeInfoPacket(slotNumber) {
-        return MyAttempt.createTestInfoPacket();
+        // return MyAttempt.createTestInfoPacket();
         
         const out = Buffer.alloc(INFO_PACKET_TOTAL, 0);
 
@@ -229,10 +206,12 @@ class DSUServer {
 
         // Compute CRC32 over the full 32 bytes (with CRC bytes still zero) and write LE uint32 into bytes 8..11
         const checksum = crc32(out);
+        const checksum2 = zlib.crc32(out);
+        if (checksum !== checksum2)
+            console.warn('crc32 mismatch', checksum, checksum2);
         out.writeUInt32LE(checksum >>> 0, 8);
 
-
-        console.log('info packet', JSON.stringify(Array.from(out)) );
+        // console.log('info packet', JSON.stringify(Array.from(out)) );
 
         return out;
     }
@@ -274,33 +253,33 @@ class DSUServer {
         out.writeUInt32LE(packetCount >>> 0, 32);
 
         
-        // ---------- BUTTONS / STICKS / ANALOGS REGION: offsets 36..55 ----------
-        const bOff = 36;
-        out[bOff + 0] = 0x00 & 0xFF;                            // Byte1
-        out[bOff + 1] = 0x00 & 0xFF;                            // Byte2
-        out[bOff + 2] = (c.data.Home ? 0x01 : 0x00) & 0xFF;     // Home
-        out[bOff + 3] = 0x00 & 0xFF;                            // Touch
+        // // ---------- BUTTONS / STICKS / ANALOGS REGION: offsets 36..55 ----------
+        // const bOff = 36;
+        // out[bOff + 0] = 0x00 & 0xFF;                            // Byte1
+        // out[bOff + 1] = 0x00 & 0xFF;                            // Byte2
+        // out[bOff + 2] = (c.data.Home ? 0x01 : 0x00) & 0xFF;     // Home
+        // out[bOff + 3] = 0x00 & 0xFF;                            // Touch
 
-        out[bOff + 4] = 128 & 0xFF;                             // leftStickX
-        out[bOff + 5] = 128 & 0xFF;                             // leftStickY
-        out[bOff + 6] = 128 & 0xFF;                             // rightStickX
-        out[bOff + 7] = 128 & 0xFF;                             // rightStickY
+        // out[bOff + 4] = 128 & 0xFF;                             // leftStickX
+        // out[bOff + 5] = 128 & 0xFF;                             // leftStickY
+        // out[bOff + 6] = 128 & 0xFF;                             // rightStickX
+        // out[bOff + 7] = 128 & 0xFF;                             // rightStickY
 
-        out[bOff + 8] = (c.data.PadW ? 255 : 0) & 0xFF;         // analogDpadLeft
-        out[bOff + 9] = (c.data.PadS ? 255 : 0) & 0xFF;         // analogDpadDown
-        out[bOff +10] = (c.data.PadE ? 255 : 0) & 0xFF;         // analogDpadRight
-        out[bOff +11] = (c.data.PadN ? 255 : 0) & 0xFF;         // analogDpadUp
+        // out[bOff + 8] = (c.data.PadW ? 255 : 0) & 0xFF;         // analogDpadLeft
+        // out[bOff + 9] = (c.data.PadS ? 255 : 0) & 0xFF;         // analogDpadDown
+        // out[bOff +10] = (c.data.PadE ? 255 : 0) & 0xFF;         // analogDpadRight
+        // out[bOff +11] = (c.data.PadN ? 255 : 0) & 0xFF;         // analogDpadUp
 
-        out[bOff +12] = (c.data.A ? 255 : 0) & 0xFF;            // analogY (up)
-        out[bOff +13] = (c.data.B ? 255 : 0) & 0xFF;            // analogB (right)
-        out[bOff +14] = (c.data.One ? 255 : 0) & 0xFF;          // analogA (down)
-        out[bOff +15] = (c.data.Two ? 255 : 0) & 0xFF;          // analogX (left)
+        // out[bOff +12] = (c.data.A ? 255 : 0) & 0xFF;            // analogY (up)
+        // out[bOff +13] = (c.data.B ? 255 : 0) & 0xFF;            // analogB (right)
+        // out[bOff +14] = (c.data.One ? 255 : 0) & 0xFF;          // analogA (down)
+        // out[bOff +15] = (c.data.Two ? 255 : 0) & 0xFF;          // analogX (left)
 
-        out[bOff +16] = (c.data.Plus ? 255 : 0)  & 0xFF;        // analogR1
-        out[bOff +17] = (c.data.Minus ? 255 : 0) & 0xFF;        // analogL1
-        out[bOff +18] = 0 & 0xFF;                               // analogR2
-        out[bOff +19] = 0 & 0xFF;                               // analogL2
-        // ---------- end buttons region ----------
+        // out[bOff +16] = (c.data.Plus ? 255 : 0)  & 0xFF;        // analogR1
+        // out[bOff +17] = (c.data.Minus ? 255 : 0) & 0xFF;        // analogL1
+        // out[bOff +18] = 0 & 0xFF;                               // analogR2
+        // out[bOff +19] = 0 & 0xFF;                               // analogL2
+        // // ---------- end buttons region ----------
 
         // Timestamp: Arduino places 4 lower bytes at offset 68 and zeros the higher 4 bytes at 72..75
         out.writeUInt32LE(timestamp32 >>> 0, 68);
@@ -314,12 +293,12 @@ class DSUServer {
         // 88: gyro pitch
         // 92: gyro yaw
         // 96: gyro roll
-        // out.writeFloatLE(accX, 76);
-        // out.writeFloatLE(accY, 80);
-        // out.writeFloatLE(accZ, 84);
-        // out.writeFloatLE(gyroP, 88);
-        // out.writeFloatLE(gyroY, 92);
-        // out.writeFloatLE(gyroR, 96);
+        // out.writeFloatLE(0, 76);
+        // out.writeFloatLE(0, 80);
+        // out.writeFloatLE(0, 84);
+        // out.writeFloatLE(0, 88);
+        // out.writeFloatLE(0, 92);
+        // out.writeFloatLE(0, 96);
         out.writeFloatLE(c.data.AccelerometerX, 76);
         out.writeFloatLE(c.data.AccelerometerY, 80);
         out.writeFloatLE(c.data.AccelerometerZ, 84);
@@ -329,7 +308,12 @@ class DSUServer {
 
         // Compute CRC32 over full 100 bytes (CRC field still zero) and write to bytes 8..11 LE
         const checksum = crc32(out);
+        const checksum2 = crc32(out);
+        if (checksum !== checksum2)
+            console.warn('crc32 mismatch', checksum, checksum2);
         out.writeUInt32LE(checksum >>> 0, 8);
+
+        logger.logPacket(out);
 
         return out;
     }
@@ -381,15 +365,17 @@ class FONEMOTE {
             Gyroscope_Roll: (data.Gyroscope_Roll===undefined) ? current.Gyroscope_Roll : data.Gyroscope_Roll,
         };
 
-        if (!this.sendOnFixedInterval)
+        if (!this.sendOnFixedInterval) {
             this.server.sendPacket( this.server.makeDataPacket(slot) );
+        }
     }
     setDataAttr(slot, attr, val) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
         this.server.controllerStates[slot].data[attr] = val;
         
-        if (!this.sendOnFixedInterval)
+        if (!this.sendOnFixedInterval) {
             this.server.sendPacket( this.server.makeDataPacket(slot) );
+        }
     }
     disconnect(slot) {
         if (!this.server.controllerStates[slot] || this.server.controllerStates[slot].connectedState === 0) return;
@@ -409,18 +395,18 @@ export default FONEMOTE;
 function testCode() {
     let PhoneMote = new FONEMOTE(false);
     let slot = PhoneMote.connectNewPhone();
-    console.log('Slot', slot);
-    PhoneMote.server.makeInfoPacket(slot);
+    // console.log('Slot', slot);
+    // PhoneMote.server.makeInfoPacket(slot);
 
-    // Push A
-    pushA(PhoneMote, slot, false);
+    // // Push A
+    // pushA(PhoneMote, slot, false);
 
-    // Make gyroscope roll with sin wave
-    let offset = 0;
-    setInterval(() => {
-        PhoneMote.setDataAttr(slot, 'Gyroscope_Roll', Math.sin(offset * Math.PI / 180) * 55.0);
-        offset = (offset + 1);
-    }, 7);
+    // // Make gyroscope roll with sin wave
+    // let offset = 0;
+    // setInterval(() => {
+    //     PhoneMote.setDataAttr(slot, 'Gyroscope_Roll', Math.sin(offset * Math.PI / 180) * 55.0);
+    //     offset = (offset + 1);
+    // }, 7);
 }
 async function pushA(PhoneMote, slot, val) {  // Push / release A every second
     console.log('Setting A to:', val);
@@ -428,4 +414,4 @@ async function pushA(PhoneMote, slot, val) {  // Push / release A every second
     PhoneMote.setDataAttr(slot, 'A', val?1:0);
     setTimeout(() => pushA(PhoneMote, slot, !val), 1000);
 }
-testCode();
+if (import.meta.main) testCode();
