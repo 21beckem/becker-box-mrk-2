@@ -1,7 +1,7 @@
 import GUI from './gui.js';
 import { Peer } from 'https://esm.sh/peerjs@1.5.5?bundle-deps';
+const JSAlert = window.JSAlert;
 const peer = new Peer(null);
-window.peer = peer;
 const status = {
 	connecting: 'Connecting to BeckerBox host<br><br>Please wait...',
 	connected: 'Connected!<br><br>Launching remote...',
@@ -22,6 +22,14 @@ const PACKET = {
 	PadS: 0,
 	PadE: 0,
 	PadW: 0,
+	AccelerometerX: 0.0,
+	AccelerometerY: 0.0,
+	AccelerometerZ: 0.0,
+	Gyroscope_Pitch: 0.0,
+	Gyroscope_Yaw: 0.0,
+	Gyroscope_Roll: 0.0
+}
+const RAW_MOTION = {
 	AccelerometerX: 0.0,
 	AccelerometerY: 0.0,
 	AccelerometerZ: 0.0,
@@ -112,51 +120,38 @@ class Remote {
 	static clamp = (x) => (x === null || x === undefined) ? 0 : x; // Math.round(x * 100) / 100;
 	static applyCalibration = (x, calibration) => {
 		x = this.clamp(x);
-		if (x - calibration < 0)
+		if (x - calibration < -180)
 			return (x - calibration) + 360;
+		else if (x - calibration > 180)
+			return (x - calibration) - 360;
 		else
 			return x - calibration;
 	}
 	static handleMotion(e) {
-		// alert([
-		// 	e.acceleration.x,
-		// 	this.clamp(e.acceleration.x),
-		// 	PACKET.AccelerometerX,
-		// 	this.clamp(e.acceleration.x) - PACKET.AccelerometerX
-		// ].join('\n'));
-		// PACKET.AccelerometerX = this.clamp(e.acceleration.x) - PACKET.AccelerometerX;
-		// PACKET.AccelerometerY = this.clamp(e.acceleration.y) - PACKET.AccelerometerY;
-		// PACKET.AccelerometerZ = this.clamp(e.acceleration.z) - PACKET.AccelerometerZ;
-		// PACKET.AccelerometerX = this.clamp(e.acceleration.x);
-		// PACKET.AccelerometerY = this.clamp(e.acceleration.y);
-		// PACKET.AccelerometerZ = this.clamp(e.acceleration.z);
+		RAW_MOTION.AccelerometerX = e.acceleration.x;
+		RAW_MOTION.AccelerometerY = e.acceleration.y;
+		RAW_MOTION.AccelerometerZ = e.acceleration.z;
 		PACKET.AccelerometerX = this.applyCalibration(e.acceleration.x, this.calibration.AccelerometerX);
 		PACKET.AccelerometerY = this.applyCalibration(e.acceleration.y, this.calibration.AccelerometerY);
 		PACKET.AccelerometerZ = this.applyCalibration(e.acceleration.z, this.calibration.AccelerometerZ);
 	}
 	static handleOrientation(e) {
-		// PACKET.Gyroscope_Yaw = this.clamp(e.alpha) - PACKET.Gyroscope_Yaw;
-		// PACKET.Gyroscope_Pitch = this.clamp(e.beta) - PACKET.Gyroscope_Pitch;
-		// PACKET.Gyroscope_Roll = this.clamp(e.gamma) - PACKET.Gyroscope_Roll;
-		// PACKET.Gyroscope_Yaw = this.clamp(e.alpha);
-		// PACKET.Gyroscope_Pitch = this.clamp(e.beta);
-		// PACKET.Gyroscope_Roll = this.clamp(e.gamma);
-		PACKET.Gyroscope_Yaw = this.applyCalibration(e.alpha, this.calibration.Gyroscope_Yaw);
-		PACKET.Gyroscope_Pitch = this.applyCalibration(e.beta, this.calibration.Gyroscope_Pitch);
-		PACKET.Gyroscope_Roll = this.applyCalibration(e.gamma, this.calibration.Gyroscope_Roll) - 180;
+		RAW_MOTION.Gyroscope_Yaw = e.alpha;
+		RAW_MOTION.Gyroscope_Pitch = e.beta;
+		RAW_MOTION.Gyroscope_Roll = e.gamma;
+		RAW_MOTION.Gyroscope_Yaw = e.alpha - 180;
+		RAW_MOTION.Gyroscope_Pitch = e.beta > 180 ? e.beta - 360 : e.beta;
+		RAW_MOTION.Gyroscope_Roll = e.gamma > 180 ? e.gamma - 360 : e.gamma;
+
+		PACKET.Gyroscope_Yaw = this.applyCalibration(RAW_MOTION.Gyroscope_Yaw, this.calibration.Gyroscope_Yaw);
+		PACKET.Gyroscope_Pitch = this.applyCalibration(RAW_MOTION.Gyroscope_Pitch, this.calibration.Gyroscope_Pitch);
+		PACKET.Gyroscope_Roll = this.applyCalibration(RAW_MOTION.Gyroscope_Roll, this.calibration.Gyroscope_Roll);
 	}
 	static sendPacketNow() {
 		if (peer && !peer.disconnected && this.conn && this.conn.open) {
-			this.conn.send(this.adjustPacketBeforeSending(PACKET));
+			this.conn.send(PACKET);
 			// console.log('sent packet');
 		}
-	}
-	static adjustPacketBeforeSending(data) {
-		data = { ...data };
-		data.Gyroscope_Pitch = data.Gyroscope_Pitch > 180 ? data.Gyroscope_Pitch - 360 : data.Gyroscope_Pitch;
-		data.Gyroscope_Yaw = data.Gyroscope_Yaw - 180;
-		data.Gyroscope_Roll = data.Gyroscope_Roll > 0 ? data.Gyroscope_Roll - 180 : data.Gyroscope_Roll + 180;
-		return data;
 	}
 	static startSendingPackets() {
 		if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
@@ -168,17 +163,21 @@ class Remote {
 	}
 
 	static calibrate() {
-		if (confirm('Please place the remote on a flat surface facing directly towards the BeckerBox screen. Then press OK to calibrate.')) {
+		var alert = new JSAlert('Please place the remote on a flat surface facing directly towards the screen. Then press <i>Calibrate</i> to confirm.', 'Calibrate');
+		alert.setIcon(JSAlert.Icons.Becker);
+		alert.addButton('Cancel');
+		alert.addButton('Calibrate').then(() => {
 			this.calibration = {
-				AccelerometerX: PACKET.AccelerometerX,
-				AccelerometerY: PACKET.AccelerometerY,
-				AccelerometerZ: PACKET.AccelerometerZ,
-				Gyroscope_Pitch: PACKET.Gyroscope_Pitch,
-				Gyroscope_Yaw: PACKET.Gyroscope_Yaw,
-				Gyroscope_Roll: PACKET.Gyroscope_Roll
+				AccelerometerX: RAW_MOTION.AccelerometerX,
+				AccelerometerY: RAW_MOTION.AccelerometerY,
+				AccelerometerZ: RAW_MOTION.AccelerometerZ,
+				Gyroscope_Pitch: RAW_MOTION.Gyroscope_Pitch,
+				Gyroscope_Yaw: RAW_MOTION.Gyroscope_Yaw,
+				Gyroscope_Roll: RAW_MOTION.Gyroscope_Roll
 			}
 			saveCalibrationToStorage(this.calibration);
-		}
+		});
+		alert.show();
 	}
 }
 Remote.init();
