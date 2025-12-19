@@ -179,6 +179,12 @@ class Remote {
 		});
 		alert.show();
 	}
+
+	static changeDisk() {
+		this.conn.send({
+			menuAction: 'changeDisk'
+		});
+	}
 }
 Remote.init();
 

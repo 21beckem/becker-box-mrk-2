@@ -8,6 +8,7 @@ class GUI {
 	static setRemote(remote) { this.Remote = remote; }
 	static init() {
 		_('launchFullscreenBtn').addEventListener('click', this.attemptFullscreen);
+		_('menuBarsBtn').addEventListener('click', () => this.openMenu());
 		_('calibrateBtn').addEventListener('click', () => this.Remote.calibrate());
 		this.setBposition();
 		window.addEventListener('resize', this.setBposition);
@@ -83,6 +84,11 @@ class GUI {
 		_('connectingText').innerHTML = status;
 		_('connectPage').style.display = '';
 		_('RemotePage').style.display = 'none';
+	}
+
+	static openMenu() {
+		// TODO: open menu
+		this.Remote.changeDisk();
 	}
 }
 

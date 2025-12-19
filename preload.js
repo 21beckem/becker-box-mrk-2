@@ -12,5 +12,11 @@ contextBridge.exposeInMainWorld('electron', {
 	},
 	sendPacket: (slot, data) => {
 		return ipcRenderer.invoke('sendPacket', slot, data);
+	},
+	startWii: () => {
+		return ipcRenderer.invoke('startWii');
+	},
+	changeDisk: () => {
+		return ipcRenderer.invoke('changeDisk');
 	}
 });

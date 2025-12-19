@@ -21,6 +21,14 @@ export default class Player {
         })
         this.conn.on('data', (data) => {
             this.#restartDisconnectTimer();
+            if (data.menuAction) {
+                switch (data.menuAction) {
+                    case 'changeDisk':
+                        window.electron.changeDisk();
+                        break;
+                }
+                return;
+            }
 
             this.pointer.newPacket( this.#convertData(data) );
             window.electron.sendPacket(this.slot, data);

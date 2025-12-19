@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import * as DolphinController from './dolphinController.js';
 import FONEMOTE from './PhoneMote.js';
 const PhoneMote = new FONEMOTE(false);
 
@@ -48,4 +49,12 @@ ipcMain.handle('addPlayer', (_event) => {
 });
 ipcMain.handle('removePlayer', (_event, slot) => {
     return PhoneMote.disconnect(slot);
+});
+ipcMain.handle('startWii', (_event) => {
+    DolphinController.startWii();
+    return true;
+});
+ipcMain.handle('changeDisk', (_event) => {
+    DolphinController.changeDisk(PhoneMote);
+    return true;
 });
