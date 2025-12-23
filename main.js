@@ -24,6 +24,20 @@ app.whenReady().then(() =>{
     win.loadURL('http://localhost:5500/web/host/');
 });
 
+
+// --- Useful functions ---
+function startDiscSelection() {
+    PhoneMote.disable();
+    bringWindowToFront();
+}
+function bringWindowToFront(win) {
+    const win = BrowserWindow.getAllWindows()[0];
+    if (win.isMinimized()) win.restore(); // Optional: restore if minimized
+    win.setAlwaysOnTop(true);
+    win.show(); // Ensure it is visible
+    win.setAlwaysOnTop(false);
+}
+
 function printClean(val) {
     if (typeof val !== 'number') console.log(val);
     else {
@@ -53,6 +67,13 @@ ipcMain.handle('removePlayer', (_event, slot) => {
 ipcMain.handle('startWii', (_event) => {
     DolphinController.startWii();
     return true;
+});
+ipcMain.handle('startDiscSelection', (_event) => {
+    startDiscSelection();
+    return true;
+});
+ipcMain.handle('getGameList', (_event) => {
+    return DolphinController.getDiscList();
 });
 ipcMain.handle('changeDisk', (_event) => {
     DolphinController.changeDisk(PhoneMote);

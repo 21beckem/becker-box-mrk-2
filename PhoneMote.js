@@ -71,7 +71,9 @@ const DefaultControllerState = {
 }
 
 class DSUServer {
+    #enabled;
     constructor(host, port) {
+        this.#enabled = true;
         this.host = host;
         this.port = port;
         this.clientAddress = null;
@@ -90,6 +92,8 @@ class DSUServer {
         0x110001: '(Unofficial) Information about controller motors', // unofficial
         0x110002: '(Unofficial) Rumble controller motor'              // unofficial
     };
+    enable() { this.#enabled = true; }
+    disable() { this.#enabled = false; }
 
     start(keepSendingData) {
         // Bind the socket
@@ -322,6 +326,7 @@ class DSUServer {
         return out;
     }
     sendPacket(packet, sendSecondPacket=false) {
+        if (!this.#enabled) return;
         if (!this.clientAddress) return;
         
         this.serverSocket.send(packet, 0, packet.length, this.clientAddress.port, this.clientAddress.address, (err) => {
@@ -402,6 +407,12 @@ class FONEMOTE {
     }
     clear() {
         this.servers.forEach((s,i) => this.disconnect(i));
+    }
+    enable() {
+        this.servers.forEach(s => s.enable());
+    }
+    disable() {
+        this.servers.forEach(s => s.disable());
     }
 }
 export default FONEMOTE;

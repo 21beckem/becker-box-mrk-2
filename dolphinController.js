@@ -25,13 +25,18 @@ export function startWii() {
     dolphinProcess = spawn('dolphin\\Dolphin.exe', ['-b', '-n', '0000000100000002']); // wii menu
 }
 
-export function changeDisk(PhoneMote) {
+export function changeDisk(PhoneMote, path) {
+    PhoneMote.enable();
     if (!dolphinProcess) return;
 
-    setGameFilePath(PhoneMote, 'C:\\Users\\21bec\\OneDrive - BYU-Idaho\\Documents\\Wii Sports (USA).rvz');
+    setGameFilePath(PhoneMote, path);
+}
+export function getDiscList() {
+    return fs.readdirSync('games\\');
 }
 
 if (import.meta.main) {
     // test code here
-    setGameFilePath(null, 'C:\\Users\\21bec\\OneDrive - BYU-Idaho\\Documents\\Wii Sports (USA).rvz');
+    // setGameFilePath(null, 'C:\\Users\\21bec\\OneDrive - BYU-Idaho\\Documents\\Wii Sports (USA).rvz');
+    console.log(getDiscList());
 }
