@@ -3,13 +3,19 @@ import fs from 'fs';
 
 let dolphinProcess = null;
 
+let settingGamePath = false;
 async function setGameFilePath(PhoneMote, path) {
+    if (settingGamePath) return;
+    settingGamePath = true;
+    
     fs.writeFileSync('dolphin\\diskPath.txt', path.trim());
     PhoneMote.setDataAttr(0, 'ChangeDisk', 1);
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise(r => setTimeout(r, 500));
     PhoneMote.setDataAttr(0, 'ChangeDisk', 0);
     await new Promise(r => setTimeout(r, 1500));
     fs.rmSync('dolphin\\diskPath.txt');
+
+    settingGamePath = false;
 }
 
 export function startWii() {
