@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import fs from 'fs';
+import path from 'path';
 
 let dolphinProcess = null;
 
@@ -32,7 +33,17 @@ export function changeDisk(PhoneMote, path) {
     setGameFilePath(PhoneMote, path);
 }
 export function getDiscList() {
-    return fs.readdirSync('games\\');
+    if (!fs.existsSync('games\\')) return [];
+    let list = fs.readdirSync('games\\');
+    const fileTypes = ['elf', 'dol', 'gcm', 'bin', 'iso', 'tgc', 'wbfs', 'ciso', 'gcz', 'wia', 'rvz', 'wad', 'dff', 'm3u', 'json'];
+    list = list.filter(file => fileTypes.some(type => file.endsWith('.'+type)));
+    list = list.map(file => {
+        return {
+            name: file.split('.').toSpliced(-1).join('.'),
+            path: path.resolve('games\\', file)
+        }
+    })
+    return list;
 }
 
 if (import.meta.main) {
