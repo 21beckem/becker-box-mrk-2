@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -19,16 +19,27 @@ async function setGameFilePath(PhoneMote, path) {
 
     settingGamePath = false;
 }
+async function checkWindowByTitle(partialTitle) {
+    return new Promise((resolve, reject) => {
+        const command = `powershell -Command "if (Get-Process | Where-Object { $_.MainWindowTitle -like '*${partialTitle}*' }) { Exit 0 } else { Exit 1 }"`;
+    
+        exec(command, (error, stdout, stderr) => {
+            resolve(!error);
+        });
+    });
+}
 
 export function startWii() {
     // check if there already is an instance running, if so, do nothing
-    if (dolphinProcess) return;
+    if (dolphinProcess) return focusOnDolphin();
     
     dolphinProcess = spawn('dolphin\\Dolphin.exe', ['-b', '-n', '0000000100000002']); // wii menu
 }
 export function focusOnDolphin() {
     if (!dolphinProcess) return;
-    dolphinProcess.focus();
+
+    const command = `nircmd.exe win activate ititle "Dolphin"`;
+    exec(command, (error, stdout, stderr) => {});
 }
 
 export function changeDisc(PhoneMote, path) {
@@ -50,9 +61,13 @@ export function getDiscList() {
     })
     return list;
 }
+export function isOnWiiMenu() {
+    return checkWindowByTitle('0000000100000002');
+}
 
 if (import.meta.main) {
     // test code here
     // setGameFilePath(null, 'C:\\Users\\21bec\\OneDrive - BYU-Idaho\\Documents\\Wii Sports (USA).rvz');
-    console.log(getDiscList());
+    // console.log(getDiscList());
+    console.log( await checkWindowByTitle('0000000100000002') );
 }

@@ -72,12 +72,12 @@ ipcMain.handle('startWii', (_event) => {
     DolphinController.startWii();
     return true;
 });
-ipcMain.handle('focusOnElectron', (_event) => {
-    focusOnElectron();
-    return true;
-});
-ipcMain.handle('getDiscList', (_event) => {
-    return DolphinController.getDiscList();
+ipcMain.handle('startDiscSelection', async (_event) => {
+    if (await DolphinController.isOnWiiMenu()) {
+        focusOnElectron();
+        return DolphinController.getDiscList();
+    }
+    return false;
 });
 ipcMain.handle('changeDisc', (_event, path) => {
     DolphinController.focusOnDolphin();

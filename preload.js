@@ -19,8 +19,8 @@ contextBridge.exposeInMainWorld('electron', {
 	getDiscList: () => {
 		return ipcRenderer.invoke('getDiscList');
 	},
-	focusOnElectron: () => {
-		return ipcRenderer.invoke('focusOnElectron');
+	startDiscSelection: () => {
+		return ipcRenderer.invoke('startDiscSelection');
 	},
 	changeDisc: (path) => {
 		return ipcRenderer.invoke('changeDisc', path);

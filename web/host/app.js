@@ -70,12 +70,13 @@ const dummyData = [
 ];
 const discSelectPage = document.getElementById('discSelectPage');
 const discGrid = document.getElementById('discGrid');
-const backBtn = document.getElementById('backBtn');
-const insertBtn = document.getElementById('insertBtn');
+document.getElementById('backBtn').onclick = () => window.hideDiscSelectPage();
 
 window.showDiscSelectPage = async () => {
-    window.electron.startDiscSelection();
-    let discs = await window.electron.getDiscList();
+    let canStart = await window.electron.startDiscSelection();
+    if (canStart===false) return;
+
+    let discs = canStart;
     
     discSelectPage.style.display = 'unset';
     discGrid.innerHTML = '';
@@ -83,7 +84,7 @@ window.showDiscSelectPage = async () => {
     discs.forEach(disc => {
         const discBtn = document.createElement('button');
         discBtn.className = 'disc';
-        discBtn.onclick = () => window.electron.insertDisc(disc.path);
+        discBtn.onclick = () => window.electron.changeDisc(disc.path);
         discBtn.innerHTML = `
             <img src="${disc.img}" alt="${disc.name}">
             <p>${disc.name}</p>
