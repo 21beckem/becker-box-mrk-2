@@ -30,7 +30,7 @@ function startDiscSelection() {
     PhoneMote.disable();
     bringWindowToFront();
 }
-function bringWindowToFront(win) {
+function bringWindowToFront() {
     const win = BrowserWindow.getAllWindows()[0];
     if (win.isMinimized()) win.restore(); // Optional: restore if minimized
     win.setAlwaysOnTop(true);

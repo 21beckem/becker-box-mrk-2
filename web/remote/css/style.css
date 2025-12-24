@@ -257,3 +257,63 @@ html:fullscreen #openFullScreenPrompt {
 .top-nav i {
 	pointer-events: none;
 }
+
+#side-menu {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	justify-content: space-between;
+	font-size: 25px;
+	z-index: 1000;
+	pointer-events: none;
+}
+#side-menu .screen-dimmer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: -1;
+	opacity: 1;
+	pointer-events: all;
+	transition: opacity 0.2s ease;
+}
+#side-menu.closed .screen-dimmer {
+	opacity: 0;
+	pointer-events: none;
+}
+#side-menu .menu-content {
+	background-color: white;
+	box-shadow: 0 0 12px -5px rgba(0, 0, 0, 0.65);
+	z-index: 1001;
+	display: flex;
+	flex-direction: column;
+	padding: 2rem 0;
+	min-width: 65%;
+	pointer-events: all;
+	overflow: hidden;
+	transform: translateX(0);
+	transition: transform 0.2s ease;
+}
+#side-menu.closed .menu-content {
+	transform: translateX(-100%);
+}
+#side-menu .title {
+	font-size: 1.5rem;
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 1rem;
+}
+#side-menu hr {
+	width: 80%;
+	margin: 0 auto;
+}
+#side-menu .menu-btn {
+	font-size: 1.2rem;
+	cursor: pointer;
+	padding: 1rem 2rem;
+}

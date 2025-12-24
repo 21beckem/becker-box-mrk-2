@@ -8,7 +8,7 @@ const PlayerManager = new (class PlayerManager {
         this.#initPeer();
 
         // tell the backend that we are ready
-        window.electron.init();
+        window.electron?.init();
     }
     #setQrCode(id, selector='#qrcode') {
         new QRCode(document.querySelector(selector), {

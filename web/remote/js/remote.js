@@ -164,7 +164,7 @@ class Remote {
 
 	static calibrate() {
 		var alert = new JSAlert('Please place the remote on a flat surface facing directly towards the screen. Then press <i>Calibrate</i> to confirm.', 'Calibrate');
-		alert.setIcon(JSAlert.Icons.Becker);
+		// alert.setIcon(JSAlert.Icons.Becker);
 		alert.addButton('Cancel');
 		alert.addButton('Calibrate').then(() => {
 			this.calibration = {

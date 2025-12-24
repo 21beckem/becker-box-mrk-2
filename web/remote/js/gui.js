@@ -9,6 +9,7 @@ class GUI {
 	static init() {
 		_('launchFullscreenBtn').addEventListener('click', this.attemptFullscreen);
 		_('menuBarsBtn').addEventListener('click', () => this.openMenu());
+		_('changeDiscBtn').addEventListener('click', () => this.changeDisk());
 		_('calibrateBtn').addEventListener('click', () => this.Remote.calibrate());
 		this.setBposition();
 		window.addEventListener('resize', this.setBposition);
@@ -86,9 +87,12 @@ class GUI {
 		_('RemotePage').style.display = 'none';
 	}
 
-	static openMenu() {
-		// TODO: open menu
+	static openMenu() { _('side-menu').classList.remove('closed'); }
+	static closeMenu() { _('side-menu').classList.add('closed'); }
+
+	static changeDisk() {
 		this.Remote.changeDisk();
+		this.closeMenu();
 	}
 }
 
