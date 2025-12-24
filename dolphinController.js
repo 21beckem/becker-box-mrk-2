@@ -6,13 +6,14 @@ let dolphinProcess = null;
 
 let settingGamePath = false;
 async function setGameFilePath(PhoneMote, path) {
+    if (!path) path = '';
     if (settingGamePath) return;
     settingGamePath = true;
     
     fs.writeFileSync('dolphin\\diskPath.txt', path.trim());
-    PhoneMote.setDataAttr(0, 'ChangeDisk', 1);
+    PhoneMote.setDataAttr(0, 'ChangeDisc', 1);
     await new Promise(r => setTimeout(r, 500));
-    PhoneMote.setDataAttr(0, 'ChangeDisk', 0);
+    PhoneMote.setDataAttr(0, 'ChangeDisc', 0);
     await new Promise(r => setTimeout(r, 1500));
     fs.rmSync('dolphin\\diskPath.txt');
 
@@ -25,8 +26,12 @@ export function startWii() {
     
     dolphinProcess = spawn('dolphin\\Dolphin.exe', ['-b', '-n', '0000000100000002']); // wii menu
 }
+export function focusOnDolphin() {
+    if (!dolphinProcess) return;
+    dolphinProcess.focus();
+}
 
-export function changeDisk(PhoneMote, path) {
+export function changeDisc(PhoneMote, path) {
     PhoneMote.enable();
     if (!dolphinProcess) return;
 

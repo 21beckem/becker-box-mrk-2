@@ -66,7 +66,7 @@ const DefaultControllerState = {
         Gyroscope_Pitch: 0.0,
         Gyroscope_Yaw: 0.0,
         Gyroscope_Roll: 0.0,
-        ChangeDisk: 0
+        ChangeDisc: 0
     }
 }
 
@@ -285,7 +285,7 @@ class DSUServer {
 
         out[bOff +16] = (c.data.Plus ? 255 : 0)  & 0xFF;        // analogR1
         out[bOff +17] = (c.data.Minus ? 255 : 0) & 0xFF;        // analogL1
-        out[bOff +18] = (c.data.ChangeDisk ? 255 : 0) & 0xFF;   // analogR2
+        out[bOff +18] = (c.data.ChangeDisc ? 255 : 0) & 0xFF;   // analogR2
         out[bOff +19] = 0 & 0xFF;                               // analogL2
         // ---------- end buttons region ----------
 
@@ -383,7 +383,7 @@ class FONEMOTE {
             Gyroscope_Pitch: (data.Gyroscope_Pitch===undefined) ? current.Gyroscope_Pitch : data.Gyroscope_Pitch,
             Gyroscope_Yaw: (data.Gyroscope_Yaw===undefined) ? current.Gyroscope_Yaw : data.Gyroscope_Yaw,
             Gyroscope_Roll: (data.Gyroscope_Roll===undefined) ? current.Gyroscope_Roll : data.Gyroscope_Roll,
-            ChangeDisk: (data.ChangeDisk===undefined) ? current.ChangeDisk : data.ChangeDisk
+            ChangeDisc: (data.ChangeDisc===undefined) ? current.ChangeDisc : data.ChangeDisc
         };
 
         if (!this.sendOnFixedInterval) {

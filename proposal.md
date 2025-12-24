@@ -67,7 +67,7 @@
 4. **In-menu behavior**
 
    * Phones function like Wiimotes: buttons and gyro pointer. Pointer is relative (edges stop movement).
-   * While Dolphin is in the Wii Menu, Player 1 has an additional on-controller button that opens a “Change Disk / Select Game” UI. That UI displays files from the `Games/` folder and allows selecting a game using the phone pointer. Upon selection, BeckerBox tells Dolphin to insert that disk.
+   * While Dolphin is in the Wii Menu, Player 1 has an additional on-controller button that opens a “Change Disc / Select Game” UI. That UI displays files from the `Games/` folder and allows selecting a game using the phone pointer. Upon selection, BeckerBox tells Dolphin to insert that disk.
 
 5. **Play**
 
@@ -114,7 +114,7 @@
 
   * Behavior: relative motion with bounds at screen edges (no wraparound).
   * Touch area for click/touch events
-* Player 1: extra “Disk” UI button to open disk selection in the Wii Menu.
+* Player 1: extra “Disc” UI button to open disk selection in the Wii Menu.
 
 **UI characteristics**
 
@@ -151,10 +151,10 @@
 * **Permissions:** No elevation required (unless installing program for all users)
 ---
 
-# 9. Games / Disk Management
+# 9. Games / Disc Management
 
 * **Games folder:** `BeckerBox/Games/` — user places legally obtained Wii ISOs/GC disks.
-* **Disk change UI:** When Dolphin is at the Wii Menu, Player 1 presses the “Change Disk” button on the phone UI; BeckerBox opens an overlay listing files in `Games/`. Player uses phone pointer to select, then BeckerBox commands Dolphin (via DSU or Dolphin CLI) to insert the game.
+* **Disc change UI:** When Dolphin is at the Wii Menu, Player 1 presses the “Change Disc” button on the phone UI; BeckerBox opens an overlay listing files in `Games/`. Player uses phone pointer to select, then BeckerBox commands Dolphin (via DSU or Dolphin CLI) to insert the game.
 * **Legal note:** BeckerBox will **not** distribute games. Users are responsible for obtaining legal copies. (Legal section below.)
 
 ---
@@ -169,7 +169,7 @@
 * Up to 4 players connected (1 phone = 1 controller).
 * Wiimote buttons + gyro pointer working reliably.
 * Wii Menu navigation supported.
-* Disk select UI for Player 1 is highly preferred — include if achievable without delaying MVP; otherwise mark as Phase 2.
+* Disc select UI for Player 1 is highly preferred — include if achievable without delaying MVP; otherwise mark as Phase 2.
 
 **Out of scope for MVP**
 
@@ -184,7 +184,7 @@
 
 **Phase 2 (post-MVP)**
 
-* Disk change UI shipped if postponed.
+* Disc change UI shipped if postponed.
 * Alternative Controller layouts.
 * Better installer UX + auto Dolphin config.
 

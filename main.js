@@ -26,9 +26,13 @@ app.whenReady().then(() =>{
 
 
 // --- Useful functions ---
-function startDiscSelection() {
+function focusOnElectron() {
     PhoneMote.disable();
     bringWindowToFront();
+}
+function focusOnDolphin() {
+    PhoneMote.enable();
+    DolphinController.focusOnDolphin();
 }
 function bringWindowToFront() {
     const win = BrowserWindow.getAllWindows()[0];
@@ -68,14 +72,15 @@ ipcMain.handle('startWii', (_event) => {
     DolphinController.startWii();
     return true;
 });
-ipcMain.handle('startDiscSelection', (_event) => {
-    startDiscSelection();
+ipcMain.handle('focusOnElectron', (_event) => {
+    focusOnElectron();
     return true;
 });
-ipcMain.handle('getGameList', (_event) => {
+ipcMain.handle('getDiscList', (_event) => {
     return DolphinController.getDiscList();
 });
-ipcMain.handle('changeDisk', (_event) => {
-    DolphinController.changeDisk(PhoneMote);
+ipcMain.handle('changeDisc', (_event, path) => {
+    DolphinController.focusOnDolphin();
+    DolphinController.changeDisc(PhoneMote, path);
     return true;
 });

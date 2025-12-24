@@ -16,7 +16,13 @@ contextBridge.exposeInMainWorld('electron', {
 	startWii: () => {
 		return ipcRenderer.invoke('startWii');
 	},
-	changeDisk: () => {
-		return ipcRenderer.invoke('changeDisk');
+	getDiscList: () => {
+		return ipcRenderer.invoke('getDiscList');
+	},
+	focusOnElectron: () => {
+		return ipcRenderer.invoke('focusOnElectron');
+	},
+	changeDisc: (path) => {
+		return ipcRenderer.invoke('changeDisc', path);
 	}
 });

@@ -23,8 +23,8 @@ export default class Player {
             this.#restartDisconnectTimer();
             if (data.menuAction) {
                 switch (data.menuAction) {
-                    case 'changeDisk':
-                        window.electron.changeDisk();
+                    case 'changeDisc':
+                        window.showDiscSelectPage();
                         break;
                 }
                 return;

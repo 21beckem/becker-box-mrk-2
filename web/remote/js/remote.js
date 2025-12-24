@@ -180,9 +180,9 @@ class Remote {
 		alert.show();
 	}
 
-	static changeDisk() {
+	static changeDisc() {
 		this.conn.send({
-			menuAction: 'changeDisk'
+			menuAction: 'changeDisc'
 		});
 	}
 }
