@@ -70,7 +70,10 @@ const dummyData = [
 ];
 const discSelectPage = document.getElementById('discSelectPage');
 const discGrid = document.getElementById('discGrid');
-document.getElementById('backBtn').onclick = () => window.hideDiscSelectPage();
+document.getElementById('backBtn').onclick = () => {
+    window.electron.changeDisc('');
+    window.hideDiscSelectPage();
+};
 
 window.showDiscSelectPage = async () => {
     let canStart = await window.electron.startDiscSelection();
@@ -84,9 +87,12 @@ window.showDiscSelectPage = async () => {
     discs.forEach(disc => {
         const discBtn = document.createElement('button');
         discBtn.className = 'disc';
-        discBtn.onclick = () => window.electron.changeDisc(disc.path);
+        discBtn.onclick = () => {
+            window.electron.changeDisc(disc.path);
+            window.hideDiscSelectPage();
+        };
         discBtn.innerHTML = `
-            <img src="${disc.img}" alt="${disc.name}">
+            <img src="${disc.img || 'img/wii-disk.png'}" alt="${disc.name}">
             <p>${disc.name}</p>
         `;
         discGrid.appendChild(discBtn);

@@ -40,6 +40,9 @@ function bringWindowToFront() {
     win.setAlwaysOnTop(true);
     win.show(); // Ensure it is visible
     win.setAlwaysOnTop(false);
+    setTimeout(() => {
+        win.setAlwaysOnTop(false);
+    }, 100);
 }
 
 function printClean(val) {
@@ -80,7 +83,7 @@ ipcMain.handle('startDiscSelection', async (_event) => {
     return false;
 });
 ipcMain.handle('changeDisc', (_event, path) => {
-    DolphinController.focusOnDolphin();
+    focusOnDolphin();
     DolphinController.changeDisc(PhoneMote, path);
     return true;
 });

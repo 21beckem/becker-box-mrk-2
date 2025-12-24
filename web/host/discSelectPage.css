@@ -37,12 +37,12 @@
     width: auto;
 }
 #discSelectPage #discGrid {
-    display: fixed;
+    display: flex;
     top: 0; left: 0; right: 0; bottom: 0;
     height: calc(100% - 200px);
-    display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: flex-start;
     gap: 20px;
     padding: 100px 0;
     overflow: scroll;
@@ -51,4 +51,13 @@
 }
 #discSelectPage #discGrid::-webkit-scrollbar {
     display: none;
+}
+#discSelectPage #discGrid .disc {
+    border-radius: 0.5rem;
+    background: none;
+    font-size: 1.5rem;
+    max-width: 150px;
+}
+#discSelectPage #discGrid .disc img {
+    width: 100%;
 }
