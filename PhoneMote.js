@@ -1,7 +1,7 @@
 import dgram from 'dgram';
 import * as zlib from 'zlib';
-import Logger from './Logger.js';
-const logger = new Logger();
+// import Logger from './Logger.js';
+// const logger = new Logger();
 
 
 // Config (match Arduino defaults)

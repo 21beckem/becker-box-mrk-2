@@ -21,7 +21,7 @@ app.whenReady().then(() =>{
             preload: path.join(__dirname, 'preload.js'),
         },
     });
-    win.loadURL('http://localhost:5500/web/host/');
+    win.loadURL('https://21beckem.github.io/becker-box-mrk-2/web/host');
 });
 
 

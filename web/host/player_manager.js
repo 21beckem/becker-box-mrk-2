@@ -12,7 +12,7 @@ const PlayerManager = new (class PlayerManager {
     }
     #setQrCode(id, selector='#qrcode') {
         new QRCode(document.querySelector(selector), {
-            text: 'https://beckersuite.com/projects/becker-box/remote/?id=' + id,
+            text: 'https://21beckem.github.io/becker-box-mrk-2/web/remote/?id=' + id,
             width: 200,
             height: 200,
             colorDark : "#000000",
@@ -22,7 +22,7 @@ const PlayerManager = new (class PlayerManager {
         console.log('Set QR code with ID:', id);
     }
     #initPeer() {
-        this.peer = new Peer('beckerbox');//Date.now());
+        this.peer = new Peer();
         this.peer.on('open', (id) => {
             this.#setQrCode(id);
         });
