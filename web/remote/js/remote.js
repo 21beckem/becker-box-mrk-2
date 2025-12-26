@@ -2,12 +2,21 @@ import GUI from './gui.js';
 import { Peer } from 'https://esm.sh/peerjs@1.5.5?bundle-deps';
 const JSAlert = window.JSAlert;
 const peer = new Peer(null);
+const REFRESH = '<button class="wiiUIbtn" onclick="window.location.reload();" style="font-size: inherit; border-radius: 17px;">Refresh</button>';
 const status = {
 	connecting: 'Connecting to BeckerBox host<br><br>Please wait...',
 	connected: 'Connected!<br><br>Launching remote...',
-	cantconnect: 'Sorry, it looks something went wrong!<br><br>Please try scanning the QR code again.',
-	disconnected: 'Sorry, it looks like you got disconnected!<br><br>Please <button class="wiiUIbtn" onclick="window.location.reload();" style="font-size: inherit; border-radius: 17px;">Refresh</button> to reconnect, or scan the QR code again.',
-	error: (err) => `There's been an error:<br>${err}`
+	cantconnect: `Sorry, it looks something went wrong!<br><br>Please try scanning the QR code again, or ${REFRESH}`,
+	disconnected: `Sorry, it looks like you got disconnected!<br><br>Please ${REFRESH} to reconnect, or scan the QR code again.`,
+	error: (err) => `Oh no! There's been an error.
+		<br>
+		<div style="font-size: small;">
+			<span onclick="this?.parentElement?.querySelector('p')?.classList?.toggle('hide');">Click here for more details <i class="fa-solid fa-caret-down"></i></span>
+			<br>
+			<p class="hide">${err}</p>
+		</div>
+		<br>
+		Please ${REFRESH} to try again.`
 }
 
 const PACKET = {
@@ -128,29 +137,31 @@ class Remote {
 			return x - calibration;
 	}
 	static handleMotion(e) {
-		RAW_MOTION.AccelerometerX = e.acceleration.x;
-		RAW_MOTION.AccelerometerY = e.acceleration.y;
-		RAW_MOTION.AccelerometerZ = e.acceleration.z;
-		PACKET.AccelerometerX = this.applyCalibration(e.acceleration.x, this.calibration.AccelerometerX);
-		PACKET.AccelerometerY = this.applyCalibration(e.acceleration.y, this.calibration.AccelerometerY);
-		PACKET.AccelerometerZ = this.applyCalibration(e.acceleration.z, this.calibration.AccelerometerZ);
+		// Accelerometer
+		PACKET.AccelerometerX = e.accelerationIncludingGravity.x;
+		PACKET.AccelerometerY = e.accelerationIncludingGravity.y;
+		PACKET.AccelerometerZ = e.accelerationIncludingGravity.z;
+
+		// Gyroscope
+		PACKET.Gyroscope_Yaw = e.rotationRate.gamma;
+		PACKET.Gyroscope_Pitch = e.rotationRate.alpha;
+		PACKET.Gyroscope_Roll = e.rotationRate.beta;
 	}
 	static handleOrientation(e) {
-		RAW_MOTION.Gyroscope_Yaw = e.alpha;
-		RAW_MOTION.Gyroscope_Pitch = e.beta;
-		RAW_MOTION.Gyroscope_Roll = e.gamma;
-		RAW_MOTION.Gyroscope_Yaw = e.alpha - 180;
-		RAW_MOTION.Gyroscope_Pitch = e.beta > 180 ? e.beta - 360 : e.beta;
-		RAW_MOTION.Gyroscope_Roll = e.gamma > 180 ? e.gamma - 360 : e.gamma;
+		// RAW_MOTION.Gyroscope_Yaw = e.alpha;
+		// RAW_MOTION.Gyroscope_Pitch = e.beta;
+		// RAW_MOTION.Gyroscope_Roll = e.gamma;
+		// RAW_MOTION.Gyroscope_Yaw = e.alpha - 180;
+		// RAW_MOTION.Gyroscope_Pitch = e.beta > 180 ? e.beta - 360 : e.beta;
+		// RAW_MOTION.Gyroscope_Roll = e.gamma > 180 ? e.gamma - 360 : e.gamma;
 
-		PACKET.Gyroscope_Yaw = this.applyCalibration(RAW_MOTION.Gyroscope_Yaw, this.calibration.Gyroscope_Yaw);
-		PACKET.Gyroscope_Pitch = this.applyCalibration(RAW_MOTION.Gyroscope_Pitch, this.calibration.Gyroscope_Pitch);
-		PACKET.Gyroscope_Roll = this.applyCalibration(RAW_MOTION.Gyroscope_Roll, this.calibration.Gyroscope_Roll);
+		// PACKET.Gyroscope_Yaw = this.applyCalibration(RAW_MOTION.Gyroscope_Yaw, this.calibration.Gyroscope_Yaw);
+		// PACKET.Gyroscope_Pitch = this.applyCalibration(RAW_MOTION.Gyroscope_Pitch, this.calibration.Gyroscope_Pitch);
+		// PACKET.Gyroscope_Roll = this.applyCalibration(RAW_MOTION.Gyroscope_Roll, this.calibration.Gyroscope_Roll);
 	}
 	static sendPacketNow() {
 		if (peer && !peer.disconnected && this.conn && this.conn.open) {
 			this.conn.send(PACKET);
-			// console.log('sent packet');
 		}
 	}
 	static startSendingPackets() {
@@ -174,7 +185,7 @@ class Remote {
 				Gyroscope_Pitch: RAW_MOTION.Gyroscope_Pitch,
 				Gyroscope_Yaw: RAW_MOTION.Gyroscope_Yaw,
 				Gyroscope_Roll: RAW_MOTION.Gyroscope_Roll
-			}
+			};
 			saveCalibrationToStorage(this.calibration);
 		});
 		alert.show();

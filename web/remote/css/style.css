@@ -12,6 +12,14 @@ body {
 	font-family: 'ADLaM Display';
 }
 
+i {
+	pointer-events: none;
+}
+
+.hide {
+	display: none !important;
+}
+
 #connectPage {
 	display: flex;
 	align-items: center;
@@ -78,23 +86,18 @@ body {
 	font-size: 32px;
 	z-index: 1;
 }
-
 .bTri.one .btn {
 	left: calc(var(--bBtn-size) / -2)
 }
-
 .bTri.two .btn {
 	right: calc(var(--bBtn-size) / -2)
 }
-
 .bTri.one .text {
 	left: 30px
 }
-
 .bTri.two .text {
 	right: 30px
 }
-
 .bTri .text {
 	position: fixed;
 	top: calc(var(--bBtn-top) + 60px);
@@ -111,7 +114,6 @@ body {
 	aspect-ratio: 1;
 	filter: drop-shadow(0px 0px 4px gray);
 }
-
 .dpad div {
 	flex: 0 0 33.3333%;
 	border: none;
@@ -123,29 +125,23 @@ body {
 	justify-content: center;
 	filter: none !important;
 }
-
 div.btn,
 .dpad div.ctr {
 	background: #dadada;
 	filter: drop-shadow(0px 0px 4px gray);
 }
-
 div.btn.pressed {
 	background: #acacac;
 }
-
 .dpad div.btn#padUp {
 	border-radius: var(--dpad-radius) var(--dpad-radius) 0 0;
 }
-
 .dpad div.btn#padLeft {
 	border-radius: var(--dpad-radius) 0 0 var(--dpad-radius);
 }
-
 .dpad div.btn#padRight {
 	border-radius: 0 var(--dpad-radius) var(--dpad-radius) 0;
 }
-
 .dpad div.btn#padDown {
 	border-radius: 0 0 var(--dpad-radius) var(--dpad-radius);
 }
@@ -167,7 +163,6 @@ div.btn.pressed {
 	display: flex;
 	justify-content: space-between;
 }
-
 #homeRow div {
 	width: 30px;
 	aspect-ratio: 1;
@@ -190,7 +185,6 @@ div.btn.pressed {
 	flex-wrap: wrap;
 	justify-content: space-between;
 }
-
 #numBtns div {
 	width: 100%;
 	aspect-ratio: 1;
@@ -207,13 +201,11 @@ div.btn.pressed {
 	justify-content: space-between;
 	margin-bottom: 20px;
 }
-
 #lights div {
 	width: 15px;
 	aspect-ratio: 1;
 	background-color: #8f8f8f;
 }
-
 #lights div.on {
 	background-color: #38f2ff;
 	box-shadow: 0 0 11px 2px #48c8ff;
@@ -238,7 +230,6 @@ div.btn.pressed {
 	z-index: 1000;
 	padding: var(--padding);
 }
-
 body:fullscreen #openFullScreenPrompt,
 html:fullscreen #openFullScreenPrompt {
 	display: none !important;
@@ -253,7 +244,6 @@ html:fullscreen #openFullScreenPrompt {
 	justify-content: space-between;
 	font-size: 25px;
 }
-
 .top-nav i {
 	pointer-events: none;
 }

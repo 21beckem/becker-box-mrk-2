@@ -11,63 +11,6 @@ window.PlayerManager = PlayerManager;
 
 
 // --- disc select page ---
-const dummyData = [
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    },
-    {
-        name: 'Wii Sports',
-        img: 'https://art.gametdb.com/wii/cover3D/US/RSPE01.png',
-        path: 'C:\\Users\\21bec\\local-git\\becker-box-mrk-2\\games\\Wii Sports.rvz'
-    }
-];
 const discSelectPage = document.getElementById('discSelectPage');
 const discGrid = document.getElementById('discGrid');
 document.getElementById('backBtn').onclick = () => {

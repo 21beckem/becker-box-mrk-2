@@ -42,16 +42,26 @@ class GUI {
 		});
 	}
 	static attemptFullscreen() {
+		// Request motion events permission for iOS 13+ devices
+		if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') {
+			DeviceMotionEvent.requestPermission();
+		}
+		// prevent screen from sleeping
 		noSleep.enable();
+
+		// attempt to go fullscreen
 		try {
 			let elem = document.documentElement;
-			if (elem.requestFullscreen) {
+			if (typeof elem.requestFullscreen === 'function') {
 				elem.requestFullscreen();
-			} else if (elem.mozRequestFullScreen) {
+			}
+			if (typeof elem.mozRequestFullScreen === 'function') {
 				elem.mozRequestFullScreen();
-			} else if (elem.webkitRequestFullscreen) {
+			}
+			if (typeof elem.webkitRequestFullscreen === 'function') {
 				elem.webkitRequestFullscreen();
-			} else if (elem.msRequestFullscreen) {
+			}
+			if (typeof elem.msRequestFullscreen === 'function') {
 				elem.msRequestFullscreen();
 			}
 

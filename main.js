@@ -46,11 +46,23 @@ function bringWindowToFront() {
 }
 
 function printClean(val) {
-    if (typeof val !== 'number') console.log(val);
-    else {
-        if (val >= 0) console.log(' '+val.toFixed(2));
-        else console.log(val.toFixed(2));
+    function formatNum(val) {
+        if (typeof val === 'number')
+            if (val >= 0)
+                return ' '+val.toFixed(2);
+            else
+                return val.toFixed(2);
+        else
+            if (typeof val.toString === 'function')
+                return val.toString();
+            else
+                return JSON.stringify(val);
     }
+    if (Array.isArray(val)) {
+        console.log(val.map(formatNum).map(v => v.toString().padStart(6, ' ')).join(', '));
+        return;
+    }
+    console.log(formatNum(val));
 }
 
 // --- electron IPC handlers ---
@@ -59,7 +71,7 @@ ipcMain.handle('init', (_event) => {
 });
 ipcMain.handle('sendPacket', (_event, slot, data) => {
     try {
-        // printClean(data.Gyroscope_Yaw);
+        printClean([ data.Gyroscope_Roll, data.Gyroscope_Yaw, data.Gyroscope_Pitch ]);
         return PhoneMote.setPacket(slot, data);
     } catch (error) {
         return false;
