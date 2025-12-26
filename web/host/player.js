@@ -30,29 +30,9 @@ export default class Player {
                 return;
             }
 
-            this.pointer.newPacket( this.#convertData(data) );
+            this.pointer.newPacket(data);
             window.electron.sendPacket(this.slot, data);
         });
-    }
-    #convertData(data) {
-        if (!this.#lastPacket) {
-            this.#lastPacket = data;
-            return data;
-        }
-        let newData = {
-            ...data,
-            raw: data,
-
-            AccelerometerX: data.AccelerometerX - this.#lastPacket.AccelerometerX,
-            AccelerometerY: data.AccelerometerY - this.#lastPacket.AccelerometerY,
-            AccelerometerZ: data.AccelerometerZ - this.#lastPacket.AccelerometerZ,
-
-            Gyroscope_Yaw: data.Gyroscope_Yaw - this.#lastPacket.Gyroscope_Yaw,
-            Gyroscope_Pitch: data.Gyroscope_Pitch - this.#lastPacket.Gyroscope_Pitch,
-            Gyroscope_Roll: data.Gyroscope_Roll - this.#lastPacket.Gyroscope_Roll
-        };
-        this.#lastPacket = data;
-        return newData;
     }
     remove() {
         this.#disconnect();

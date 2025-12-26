@@ -307,11 +307,11 @@ class DSUServer {
         // out.writeFloatLE(0, 88);
         // out.writeFloatLE(0, 92);
         // out.writeFloatLE(0, 96);
-        out.writeFloatLE(c.data.AccelerometerX, 76);
-        out.writeFloatLE(c.data.AccelerometerY, 80);
-        out.writeFloatLE(c.data.AccelerometerZ, 84);
+        out.writeFloatLE(c.data.AccelerometerX / -9.8, 76);
+        out.writeFloatLE(c.data.AccelerometerZ / -9.8, 80);
+        out.writeFloatLE(c.data.AccelerometerY / 9.8, 84);
         out.writeFloatLE(c.data.Gyroscope_Pitch, 88);
-        out.writeFloatLE(c.data.Gyroscope_Yaw, 92);
+        out.writeFloatLE(c.data.Gyroscope_Yaw * -1, 92);
         out.writeFloatLE(c.data.Gyroscope_Roll, 96);
 
         // Compute CRC32 over full 100 bytes (CRC field still zero) and write to bytes 8..11 LE

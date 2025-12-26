@@ -16,7 +16,7 @@ export default class Pointer {
         this.hoveredElements[0]?.click();
     }
     newPacket(data) {
-        // console.log(data.Gyroscope_Yaw, data.Gyroscope_Pitch);
+        console.log(data.Gyroscope_Yaw, data.Gyroscope_Pitch);
         this.move(
             -data.Gyroscope_Yaw,
             -data.Gyroscope_Pitch
@@ -43,7 +43,7 @@ export default class Pointer {
         this.DIV.style.transform = `rotate(${angle}deg)`;
     }
     move(x, y) {
-        const speedFactor = 0.05;
+        const speedFactor = 0.00025;
         const xSpeed = document.documentElement.clientWidth * speedFactor;
         const ySpeed = document.documentElement.clientHeight * speedFactor;
 
